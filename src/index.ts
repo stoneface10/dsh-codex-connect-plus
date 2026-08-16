@@ -71,13 +71,16 @@ import {
 import type { OpenAICodexSearchContextSize, OpenAICodexSearchMode } from './search.ts'
 import { OpenAICodexCredentialStore, OPENAI_CODEX_PROVIDER } from './store.ts'
 import {
+  MAX_OPENAI_CODEX_MODEL_RETRIES,
   OPENAI_CODEX_SETTINGS_NAMESPACE,
   resolveOpenAICodexSettings,
 } from './settings-contract.ts'
 
 export {
   decodeOpenAICodexSettings,
+  DEFAULT_OPENAI_CODEX_MODEL_MAX_RETRIES,
   DEFAULT_OPENAI_CODEX_SETTINGS,
+  MAX_OPENAI_CODEX_MODEL_RETRIES,
   OPENAI_CODEX_SETTINGS_NAMESPACE,
   resolveOpenAICodexSettings,
 } from './settings-contract.ts'
@@ -120,6 +123,8 @@ export const OPENAI_CODEX_SETTINGS_NS = settingsNamespace(OPENAI_CODEX_SETTINGS_
 
 /** Composite model and standalone-search configuration. */
 export interface Config {
+  /** Extra full model requests after a transient failure (default 0, maximum 2). */
+  modelMaxRetries?: number
   /** Register the optional standalone Codex search provider. */
   enableSearch?: boolean
   /** Register the optional image-loading tool. */
@@ -137,6 +142,7 @@ export interface Config {
 }
 
 export const Config: z<Config> = z.object({
+  modelMaxRetries: z.number().step(1).min(0).max(MAX_OPENAI_CODEX_MODEL_RETRIES).default(0),
   enableSearch: z.boolean().default(false),
   enableImageTool: z.boolean().default(false),
   enableImageGeneration: z.boolean().default(true),
@@ -158,10 +164,13 @@ export function apply(ctx: Context, config: Config): void {
   const credentials = new OpenAICodexCredentialStore()
   const auth = new OpenAICodexAuthRuntime(credentials)
   assertNoOpenAICodexProviderConflict(ctx.llm.listProviders().map(provider => provider.id))
-  ctx.llm.registerAdapter(
-    [OPENAI_CODEX_PROVIDER],
-    createOpenAICodexAdapter(auth, () => ctx.get('attachments')),
+  const adapter = createOpenAICodexAdapter(
+    auth,
+    () => ctx.get('attachments'),
+    () => resolveOpenAICodexSettings(current()).modelMaxRetries,
   )
+  const adapterRegistration = ctx.llm.registerAdapter([OPENAI_CODEX_PROVIDER], adapter)
+  let registeredModelMaxRetries = resolveOpenAICodexSettings(current()).modelMaxRetries
   ctx.llm.registerConfigurableProviders([{
     provider: OPENAI_CODEX_PROVIDER,
     displayName: 'OpenAI Codex',
@@ -260,6 +269,11 @@ export function apply(ctx: Context, config: Config): void {
   }
 
   const scheduleCapabilities = (): void => {
+    const modelMaxRetries = resolveOpenAICodexSettings(current()).modelMaxRetries
+    if (modelMaxRetries !== registeredModelMaxRetries) {
+      adapterRegistration.replace([OPENAI_CODEX_PROVIDER])
+      registeredModelMaxRetries = modelMaxRetries
+    }
     searchTail = searchTail.then(reconcileSearch, reconcileSearch).catch((error: unknown) => {
       ctx.logger.error('dsh-codex-connect-plus: could not apply the updated search configuration')
       ctx.logger.error(error)

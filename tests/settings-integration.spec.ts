@@ -63,6 +63,7 @@ describe('OpenAI Codex Host settings integration', () => {
     }])
     const descriptor = ctx.settings.describe().find(entry => entry.ns === OpenAICodex.OPENAI_CODEX_SETTINGS_NS)
     expect(descriptor?.value).toEqual(OpenAICodex.DEFAULT_OPENAI_CODEX_SETTINGS)
+    expect(ctx.llm.providerRetryPolicy('openai-codex')).toMatchObject({ mode: 'normal', maxRetries: 0 })
     expect(ctx.tools.get(OpenAICodex.VIEW_IMAGE_TOOL_NAME)).toBeUndefined()
     await vi.waitFor(() => {
       expect(ctx.tools.get(OpenAICodex.CODEX_IMAGE_GENERATE_TOOL_NAME)).toBeDefined()
@@ -71,6 +72,7 @@ describe('OpenAI Codex Host settings integration', () => {
     await expect(ctx.web.search({ query: 'disabled' })).rejects.toMatchObject({ code: 'WEB_PROVIDER_UNAVAILABLE' })
 
     await ctx.settings.update(OpenAICodex.OPENAI_CODEX_SETTINGS_NS, {
+      modelMaxRetries: 1,
       enableSearch: true,
       enableImageTool: true,
       searchModel: 'gpt-search-settings-test',
@@ -81,6 +83,7 @@ describe('OpenAI Codex Host settings integration', () => {
     await vi.waitFor(() => {
       expect(ctx.tools.get(OpenAICodex.VIEW_IMAGE_TOOL_NAME)).toBeDefined()
     })
+    expect(ctx.llm.providerRetryPolicy('openai-codex')).toMatchObject({ mode: 'normal', maxRetries: 1 })
     await expect(ctx.web.search({ query: 'enabled' })).rejects.toMatchObject({ code: 'WEB_PROVIDER_CREDENTIAL_MISSING' })
 
     await ctx.settings.update(OpenAICodex.OPENAI_CODEX_SETTINGS_NS, {

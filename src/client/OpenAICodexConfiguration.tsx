@@ -40,6 +40,7 @@ const UNAVAILABLE_SNAPSHOT = {
 }
 
 const CONFIG_FIELDS = [
+  'modelMaxRetries',
   'enableSearch',
   'enableImageTool',
   'enableImageGeneration',
@@ -90,11 +91,15 @@ export function OpenAICodexConfiguration({ scope, t }: OpenAICodexConfigurationP
     setFeedback('idle')
   }
 
+  const validRetries = draft !== undefined
+    && Number.isInteger(draft.modelMaxRetries)
+    && draft.modelMaxRetries >= 0
+    && draft.modelMaxRetries <= 2
   const validModel = draft !== undefined && draft.searchModel.trim().length > 0
   const validTokens = draft !== undefined
     && Number.isInteger(draft.searchMaxOutputTokens)
     && draft.searchMaxOutputTokens > 0
-  const valid = validModel && validTokens
+  const valid = validRetries && validModel && validTokens
 
   const save = async (): Promise<void> => {
     if (scope === undefined || draft === undefined || !snapshot.writable || !valid) return
@@ -139,6 +144,20 @@ export function OpenAICodexConfiguration({ scope, t }: OpenAICodexConfigurationP
       {snapshot.status === 'ready' && !snapshot.writable ? <p style={errorStyle} role="alert">{t('settingsReadOnly')}</p> : null}
       {draft === undefined ? null : (
         <fieldset style={fieldsetStyle} disabled={!editable}>
+          <label style={formFieldStyle}>
+            <span style={labelStyle}>{t('modelMaxRetries')}</span>
+            <select
+              style={controlStyle}
+              value={draft.modelMaxRetries}
+              aria-invalid={!validRetries}
+              onChange={event => { update('modelMaxRetries', Number(event.currentTarget.value)) }}
+            >
+              <option value={0}>{t('retryNone')}</option>
+              <option value={1}>{t('retryOnce')}</option>
+              <option value={2}>{t('retryTwice')}</option>
+            </select>
+            <span style={bodyStyle}>{t('modelMaxRetriesHelp')}</span>
+          </label>
           <label style={toggleRowStyle}>
             <input
               type="checkbox"
@@ -225,6 +244,7 @@ export function OpenAICodexConfiguration({ scope, t }: OpenAICodexConfigurationP
           </label>
         </fieldset>
       )}
+      {!validRetries && draft !== undefined ? <p style={errorStyle} role="alert">{t('invalidModelRetries')}</p> : null}
       {!validModel && draft !== undefined ? <p style={errorStyle} role="alert">{t('invalidSearchModel')}</p> : null}
       {!validTokens && draft !== undefined ? <p style={errorStyle} role="alert">{t('invalidSearchTokens')}</p> : null}
       <p style={bodyStyle}>{t('routingNote')}</p>

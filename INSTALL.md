@@ -16,7 +16,7 @@ Install `dsh-codex-connect-plus` into one requested DeepSeek Harness profile wit
 2. Install the immutable GitHub tag (the package is not yet published to npm):
 
    ```sh
-   dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.2'
+   dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.3'
    ```
 
    Alternatively, download the `.tgz` attached to the matching GitHub prerelease and install that local path. Verify its published SHA-256 before installation.
@@ -33,7 +33,7 @@ Install `dsh-codex-connect-plus` into one requested DeepSeek Harness profile wit
 
 ## Optional configuration
 
-Use **Settings → Plugins → Plugin configuration → Codex Connect Plus** for staged Save/Discard edits. The package row supports `enableSearch` and `enableImageTool` (both default `false`) plus `enableImageGeneration` (default `true`). Enabling search registers a provider but does not select it; selecting `web.searchProvider: openai-codex` is a second explicit profile change. Setting `agent-default-model` to `openai-codex` is also a separate explicit change.
+Use **Settings → Plugins → Plugin configuration → Codex Connect Plus** for staged Save/Discard edits. The package row supports `modelMaxRetries` (default `0`, accepted range `0`–`2`), `enableSearch` and `enableImageTool` (both default `false`), plus `enableImageGeneration` (default `true`). Keep retries at `0` for quota conservation; each retry repeats the complete failed model request. Enabling search registers a provider but does not select it; selecting `web.searchProvider: openai-codex` is a second explicit profile change. Setting `agent-default-model` to `openai-codex` is also a separate explicit change.
 
 Apply only requested choices and preserve unrelated keys:
 

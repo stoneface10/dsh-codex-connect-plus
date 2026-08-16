@@ -22,13 +22,13 @@
 本包尚未发布到 npm。请从包含 `lib/` 构建产物的不可变 GitHub tag 安装：
 
 ```sh
-dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.2'
+dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.3'
 ```
 
 从 GitHub Release 下载 `.tgz` 后：
 
 ```sh
-dsh plugin --profile web add /path/to/dsh-codex-connect-plus-0.1.0-alpha.2.tgz
+dsh plugin --profile web add /path/to/dsh-codex-connect-plus-0.1.0-alpha.3.tgz
 ```
 
 本地开发链接：
@@ -47,15 +47,16 @@ dsh plugin --profile web add link:/absolute/path/to/dsh-codex-connect-plus
 2. 选择需要的可选能力。
 3. 保存 profile 配置。
 
-默认配置：
+默认能力与额度安全配置：
 
 ```yaml
+modelMaxRetries: 0
 enableSearch: false
 enableImageTool: false
 enableImageGeneration: true
 ```
 
-插件不会接管默认模型或全局搜索路由。
+插件不会接管默认模型或全局搜索路由。`modelMaxRetries: 0` 可避免瞬时失败后静默重放整次订阅请求；当可靠性比额度节省更重要时，用户可以在插件配置中显式选择重试 1–2 次。图片生成/编辑继续保持不重试，因为超时请求可能已被上游处理。
 
 ## 图片工具
 
@@ -94,6 +95,8 @@ npm pack --dry-run
 ```
 
 本仓库与上游一致，同时提交 `src/` 和构建后的 `lib/`。npm/GitHub Release 的 `.tgz` 只包含运行文件与文档，不包含源码、测试、脚本、凭据、日志或本地输出。
+
+重试、缓存、压缩与子代理额度优化见 [Token 与订阅额度优化报告](USAGE-QUOTA-OPTIMIZATION.zh.md)。
 
 ## 法律与来源
 

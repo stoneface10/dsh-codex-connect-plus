@@ -221,8 +221,14 @@ declare const DEFAULT_OPENAI_CODEX_SEARCH_MODE: OpenAICodexSearchMode;
 declare const DEFAULT_OPENAI_CODEX_SEARCH_CONTEXT_SIZE: OpenAICodexSearchContextSize;
 /** Default output budget for the standalone search response. */
 declare const DEFAULT_OPENAI_CODEX_SEARCH_MAX_OUTPUT_TOKENS = 10000;
+/** Conservative default: do not silently replay a full subscription-backed model request. */
+declare const DEFAULT_OPENAI_CODEX_MODEL_MAX_RETRIES = 0;
+/** Upper bound exposed by this plugin for deliberate transient-error retries. */
+declare const MAX_OPENAI_CODEX_MODEL_RETRIES = 2;
 /** Fully resolved user-editable section presented by Plugin configuration. */
 interface OpenAICodexSettingsConfig {
+  /** Extra full model requests after a transient failure. */
+  modelMaxRetries: number;
   enableSearch: boolean;
   enableImageTool: boolean;
   enableImageGeneration: boolean;
@@ -374,6 +380,8 @@ declare const inject: string[];
 declare const OPENAI_CODEX_SETTINGS_NS: import("@deepseek-ai/dsh-settings").SettingsNamespace;
 /** Composite model and standalone-search configuration. */
 interface Config {
+  /** Extra full model requests after a transient failure (default 0, maximum 2). */
+  modelMaxRetries?: number;
   /** Register the optional standalone Codex search provider. */
   enableSearch?: boolean;
   /** Register the optional image-loading tool. */
@@ -399,4 +407,4 @@ declare const Config: z<Config>;
  */
 declare function apply(ctx: Context, config: Config): void;
 //#endregion
-export { CODEX_IMAGE_EDIT_TOOL_NAME, CODEX_IMAGE_EDIT_URL, CODEX_IMAGE_GENERATE_TOOL_NAME, CODEX_IMAGE_GENERATE_URL, CODEX_IMAGE_MODEL, Config, DEFAULT_OPENAI_CODEX_SEARCH_CONTEXT_SIZE, DEFAULT_OPENAI_CODEX_SEARCH_MAX_OUTPUT_TOKENS, DEFAULT_OPENAI_CODEX_SEARCH_MODE, DEFAULT_OPENAI_CODEX_SEARCH_MODEL, DEFAULT_OPENAI_CODEX_SETTINGS, OPENAI_CODEX_AUTH_FILENAME, OPENAI_CODEX_BASE_URL, OPENAI_CODEX_PROVIDER, OPENAI_CODEX_SEARCH_MODEL_REQUEST_EVENT, OPENAI_CODEX_SEARCH_PROVIDER, OPENAI_CODEX_SEARCH_URL, OPENAI_CODEX_SETTINGS_NAMESPACE, OPENAI_CODEX_SETTINGS_NS, OPENAI_CODEX_USAGE_URL, type OpenAICodexAuthStatus, OpenAICodexCredentialStore, type OpenAICodexCredits, type OpenAICodexDiagnosticOptions, type OpenAICodexDiagnosticReport, type OpenAICodexIndividualLimit, type OpenAICodexRateLimit, type OpenAICodexRateLimitWindow, type OpenAICodexSearchContextSize, type OpenAICodexSearchMode, OpenAICodexSearchProvider, type OpenAICodexSearchProviderOptions, type OpenAICodexSearchRequestRecord, type OpenAICodexSettingsConfig, type OpenAICodexUsage, VIEW_IMAGE_TOOL_NAME, apply, assertNoOpenAICodexProviderConflict, createCodexImageRequest, decodeCodexImageResponse, decodeOpenAICodexSettings, detectCodexImageType, diagnoseOpenAICodex, inject, installOpenAICodexSearchEvent, loginOpenAICodex, logoutOpenAICodex, mapOpenAICodexSearchResponse, name, openAICodexAuthPath, openAICodexAuthStatus, openAICodexConflictMessage, parseOpenAICodexUsage, readOpenAICodexRateLimits, recordOpenAICodexSearchRequest, resolveCodexImageSize, resolveOpenAICodexSettings, safeCodexImageHttpError };
+export { CODEX_IMAGE_EDIT_TOOL_NAME, CODEX_IMAGE_EDIT_URL, CODEX_IMAGE_GENERATE_TOOL_NAME, CODEX_IMAGE_GENERATE_URL, CODEX_IMAGE_MODEL, Config, DEFAULT_OPENAI_CODEX_MODEL_MAX_RETRIES, DEFAULT_OPENAI_CODEX_SEARCH_CONTEXT_SIZE, DEFAULT_OPENAI_CODEX_SEARCH_MAX_OUTPUT_TOKENS, DEFAULT_OPENAI_CODEX_SEARCH_MODE, DEFAULT_OPENAI_CODEX_SEARCH_MODEL, DEFAULT_OPENAI_CODEX_SETTINGS, MAX_OPENAI_CODEX_MODEL_RETRIES, OPENAI_CODEX_AUTH_FILENAME, OPENAI_CODEX_BASE_URL, OPENAI_CODEX_PROVIDER, OPENAI_CODEX_SEARCH_MODEL_REQUEST_EVENT, OPENAI_CODEX_SEARCH_PROVIDER, OPENAI_CODEX_SEARCH_URL, OPENAI_CODEX_SETTINGS_NAMESPACE, OPENAI_CODEX_SETTINGS_NS, OPENAI_CODEX_USAGE_URL, type OpenAICodexAuthStatus, OpenAICodexCredentialStore, type OpenAICodexCredits, type OpenAICodexDiagnosticOptions, type OpenAICodexDiagnosticReport, type OpenAICodexIndividualLimit, type OpenAICodexRateLimit, type OpenAICodexRateLimitWindow, type OpenAICodexSearchContextSize, type OpenAICodexSearchMode, OpenAICodexSearchProvider, type OpenAICodexSearchProviderOptions, type OpenAICodexSearchRequestRecord, type OpenAICodexSettingsConfig, type OpenAICodexUsage, VIEW_IMAGE_TOOL_NAME, apply, assertNoOpenAICodexProviderConflict, createCodexImageRequest, decodeCodexImageResponse, decodeOpenAICodexSettings, detectCodexImageType, diagnoseOpenAICodex, inject, installOpenAICodexSearchEvent, loginOpenAICodex, logoutOpenAICodex, mapOpenAICodexSearchResponse, name, openAICodexAuthPath, openAICodexAuthStatus, openAICodexConflictMessage, parseOpenAICodexUsage, readOpenAICodexRateLimits, recordOpenAICodexSearchRequest, resolveCodexImageSize, resolveOpenAICodexSettings, safeCodexImageHttpError };

@@ -22,13 +22,13 @@ Connect a user-authorized ChatGPT subscription to DeepSeek Harness for Codex mod
 The package is not yet published to npm. Install the immutable GitHub tag containing committed `lib/` artifacts:
 
 ```sh
-dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.2'
+dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.3'
 ```
 
 From a downloaded GitHub Release package:
 
 ```sh
-dsh plugin --profile web add /path/to/dsh-codex-connect-plus-0.1.0-alpha.2.tgz
+dsh plugin --profile web add /path/to/dsh-codex-connect-plus-0.1.0-alpha.3.tgz
 ```
 
 For local development:
@@ -47,15 +47,16 @@ Open **Settings → Plugins → Plugin configuration → Codex Connect Plus**.
 2. Keep or change optional capability toggles.
 3. Save profile settings.
 
-Default capability settings:
+Default capability and quota-safety settings:
 
 ```yaml
+modelMaxRetries: 0
 enableSearch: false
 enableImageTool: false
 enableImageGeneration: true
 ```
 
-The package does not take over the profile's default model or global search route.
+The package does not take over the profile's default model or global search route. `modelMaxRetries: 0` avoids silently repeating a full subscription-backed request after a transient failure; users may deliberately select one or two retries in Plugin configuration when reliability matters more than quota conservation. Image generation/editing remains non-retrying because the provider may already have processed a timed-out request.
 
 ## Image tools
 
@@ -97,7 +98,7 @@ npm pack --dry-run
 
 The repository intentionally commits both `src/` and generated `lib/`, matching the upstream distribution model. The npm/Release `.tgz` includes runtime files and documentation, but excludes source, tests, scripts, credentials, logs, and local outputs.
 
-See [RELEASING.md](RELEASING.md) for the Alpha checklist.
+See the [Token/quota optimization report (中文)](docs/USAGE-QUOTA-OPTIMIZATION.zh.md) for retry, cache, compaction, and subagent guidance. See [RELEASING.md](RELEASING.md) for the Alpha checklist.
 
 ## Legal / provenance
 

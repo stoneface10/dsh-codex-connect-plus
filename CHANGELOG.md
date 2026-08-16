@@ -4,6 +4,18 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## 0.1.0-alpha.3 - 2026-08-16
+
+### Changed
+
+- Defaulted subscription-backed Codex model requests to zero automatic retries, preventing one transient failure from silently replaying the complete request up to two additional times.
+- Added a live `modelMaxRetries` setting with an explicit 0–2 range; zero remains the recommended quota-conserving choice.
+- Kept `gpt-image-2` generation and editing non-retrying because a timed-out upstream request may already have completed and consumed quota.
+
+### Documentation
+
+- Documented the retry/quota tradeoff and the distinction between provider-reported subscription windows and DSH token/cache accounting.
+
 ## 0.1.0-alpha.2 - 2026-08-16
 
 ### Fixed

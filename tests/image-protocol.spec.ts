@@ -55,7 +55,7 @@ describe('Codex Images protocol', () => {
       expect(headers.get('authorization')).toBe('Bearer secret-access-token')
       expect(headers.get('chatgpt-account-id')).toBe('acct-123')
       expect(headers.get('content-type')).toBe('application/json')
-      expect(headers.get('user-agent')).toBe('dsh-codex-connect-plus/0.1.0-alpha.2')
+      expect(headers.get('user-agent')).toBe('dsh-codex-connect-plus/0.1.0-alpha.3')
       expect(String(init?.body)).not.toContain('refresh')
       return new Response(JSON.stringify({ data: [{ b64_json: Buffer.from(png).toString('base64') }] }), {
         status: 200,

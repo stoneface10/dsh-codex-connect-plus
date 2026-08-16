@@ -18,9 +18,15 @@ export const DEFAULT_OPENAI_CODEX_SEARCH_MODE: OpenAICodexSearchMode = 'cached'
 export const DEFAULT_OPENAI_CODEX_SEARCH_CONTEXT_SIZE: OpenAICodexSearchContextSize = 'medium'
 /** Default output budget for the standalone search response. */
 export const DEFAULT_OPENAI_CODEX_SEARCH_MAX_OUTPUT_TOKENS = 10_000
+/** Conservative default: do not silently replay a full subscription-backed model request. */
+export const DEFAULT_OPENAI_CODEX_MODEL_MAX_RETRIES = 0
+/** Upper bound exposed by this plugin for deliberate transient-error retries. */
+export const MAX_OPENAI_CODEX_MODEL_RETRIES = 2
 
 /** Fully resolved user-editable section presented by Plugin configuration. */
 export interface OpenAICodexSettingsConfig {
+  /** Extra full model requests after a transient failure. */
+  modelMaxRetries: number
   enableSearch: boolean
   enableImageTool: boolean
   enableImageGeneration: boolean
@@ -31,6 +37,7 @@ export interface OpenAICodexSettingsConfig {
 }
 
 export const DEFAULT_OPENAI_CODEX_SETTINGS: Readonly<OpenAICodexSettingsConfig> = Object.freeze({
+  modelMaxRetries: DEFAULT_OPENAI_CODEX_MODEL_MAX_RETRIES,
   enableSearch: false,
   enableImageTool: false,
   enableImageGeneration: true,
@@ -54,6 +61,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 /** Narrow the redacted settings wire payload before it enters React state. */
 export function decodeOpenAICodexSettings(value: unknown): OpenAICodexSettingsConfig | undefined {
   if (!isRecord(value)) return undefined
+  const modelMaxRetries = value['modelMaxRetries']
   const enableSearch = value['enableSearch']
   const enableImageTool = value['enableImageTool']
   const enableImageGeneration = value['enableImageGeneration']
@@ -61,12 +69,15 @@ export function decodeOpenAICodexSettings(value: unknown): OpenAICodexSettingsCo
   const searchMode = value['searchMode']
   const searchContextSize = value['searchContextSize']
   const searchMaxOutputTokens = value['searchMaxOutputTokens']
+  if (typeof modelMaxRetries !== 'number' || !Number.isInteger(modelMaxRetries)
+    || modelMaxRetries < 0 || modelMaxRetries > MAX_OPENAI_CODEX_MODEL_RETRIES) return undefined
   if (typeof enableSearch !== 'boolean' || typeof enableImageTool !== 'boolean' || typeof enableImageGeneration !== 'boolean') return undefined
   if (typeof searchModel !== 'string' || searchModel.trim().length === 0) return undefined
   if (searchMode !== 'cached' && searchMode !== 'indexed' && searchMode !== 'live') return undefined
   if (searchContextSize !== 'low' && searchContextSize !== 'medium' && searchContextSize !== 'high') return undefined
   if (typeof searchMaxOutputTokens !== 'number' || !Number.isInteger(searchMaxOutputTokens) || searchMaxOutputTokens < 1) return undefined
   return {
+    modelMaxRetries,
     enableSearch,
     enableImageTool,
     enableImageGeneration,

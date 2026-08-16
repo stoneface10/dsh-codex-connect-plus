@@ -45,18 +45,30 @@ function requestProvider(provider: Provider): Provider {
 export function createOpenAICodexAdapter(
   auth: OpenAICodexAuthRuntime,
   resolveAttachments: () => AttachmentStore | undefined,
+  resolveModelMaxRetries: () => number = () => 0,
 ): PiAiAdapter {
   const provider = auth.provider
-  const profiles = new Map<string, ResolvedPiAiProviderProfile>([[OPENAI_CODEX_PROVIDER, {
-    provider: OPENAI_CODEX_PROVIDER,
-    displayName: 'OpenAI Codex',
-    streamIdleTimeoutMs: OPENAI_CODEX_STREAM_IDLE_TIMEOUT_MS,
-    retryPolicy: resolveRetryPolicy(undefined, 'dsh-codex-connect-plus retryPolicy'),
-    configuredMaxTokens: new Map(),
-    piProvider: requestProvider(provider),
-  }]])
+  let cachedMaxRetries: number | undefined
+  let cachedProfiles: ReadonlyMap<string, ResolvedPiAiProviderProfile> | undefined
+  const profiles = (): ReadonlyMap<string, ResolvedPiAiProviderProfile> => {
+    const maxRetries = resolveModelMaxRetries()
+    if (cachedProfiles !== undefined && cachedMaxRetries === maxRetries) return cachedProfiles
+    cachedMaxRetries = maxRetries
+    cachedProfiles = new Map<string, ResolvedPiAiProviderProfile>([[OPENAI_CODEX_PROVIDER, {
+      provider: OPENAI_CODEX_PROVIDER,
+      displayName: 'OpenAI Codex',
+      streamIdleTimeoutMs: OPENAI_CODEX_STREAM_IDLE_TIMEOUT_MS,
+      retryPolicy: resolveRetryPolicy(
+        { mode: 'normal', maxRetries },
+        'dsh-codex-connect-plus retryPolicy',
+      ),
+      configuredMaxTokens: new Map(),
+      piProvider: requestProvider(provider),
+    }]])
+    return cachedProfiles
+  }
   return new PiAiAdapter({
-    profiles: () => profiles,
+    profiles,
     resolveApiKey: () => auth.accessToken(),
     resolveAttachments,
   })
