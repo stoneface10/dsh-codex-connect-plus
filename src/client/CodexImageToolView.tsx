@@ -6,7 +6,7 @@ import type { CSSProperties } from 'react'
 import type { ImageAttachmentRef } from '@deepseek-ai/dsh-attachment'
 import type { ImageLoader } from '@deepseek-ai/dsh-client-ui-attachment'
 import type { ToolCallViewProps } from '@deepseek-ai/dsh-client-ui-tool/client'
-import { CODEX_IMAGE_EDIT_TOOL_NAME } from '../images/tools.ts'
+import { CODEX_IMAGE_EDIT_TOOL_NAME } from '../images/contract.ts'
 
 export interface CodexImageToolViewInjected {
   loadImage: ImageLoader

@@ -50,9 +50,11 @@ for (const filename of ['src/images/protocol.ts', 'src/images/tools.ts', 'src/cl
 
 const readme = await readFile(new URL('../README.md', import.meta.url), 'utf8')
 if (!readme.startsWith('# Codex Connect Plus\n\nEnglish | [中文](docs/README.zh.md)\n')) failures.push('README opening mismatch')
-if (!readme.includes('dsh plugin --profile web add dsh-codex-connect-plus@alpha')) failures.push('README must prefer the npm alpha install command')
+if (!readme.includes(`github:stoneface10/dsh-codex-connect-plus#v${packageJson.version}`)) failures.push('README must pin the current GitHub release tag')
+if (!readme.includes('not yet published to npm')) failures.push('README must not advertise an unpublished npm package')
 const chinese = await readFile(new URL('../docs/README.zh.md', import.meta.url), 'utf8')
-if (!chinese.includes('dsh plugin --profile web add dsh-codex-connect-plus@alpha')) failures.push('Chinese README must prefer the npm alpha install command')
+if (!chinese.includes(`github:stoneface10/dsh-codex-connect-plus#v${packageJson.version}`)) failures.push('Chinese README must pin the current GitHub release tag')
+if (!chinese.includes('尚未发布到 npm')) failures.push('Chinese README must not advertise an unpublished npm package')
 try {
   await stat(new URL('../README.zh.md', import.meta.url))
   failures.push('root README.zh.md must live under docs/README.zh.md')

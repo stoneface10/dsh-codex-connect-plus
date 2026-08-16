@@ -13,13 +13,13 @@ Install `dsh-codex-connect-plus` into one requested DeepSeek Harness profile wit
 ## Install and validate
 
 1. Check `dsh --version` or `dsh --help`. From a Harness checkout use `pnpm dsh`.
-2. Install the package:
+2. Install the immutable GitHub tag (the package is not yet published to npm):
 
    ```sh
-   dsh plugin --profile web add dsh-codex-connect-plus@alpha
+   dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.2'
    ```
 
-   To pin this release exactly, use `dsh plugin --profile web add dsh-codex-connect-plus@0.1.0-alpha.1`. If npm is unavailable, use `dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.1'`.
+   Alternatively, download the `.tgz` attached to the matching GitHub prerelease and install that local path. Verify its published SHA-256 before installation.
 
 3. Run `dsh --profile web --dump-config` and require exactly one `llm-openai-codex` row loading `dsh-codex-connect-plus`.
 4. Confirm the effective `agent-default-model` and `web.searchProvider` values are unchanged from before installation.
@@ -29,11 +29,11 @@ Install `dsh-codex-connect-plus` into one requested DeepSeek Harness profile wit
    dsh plugin --profile web exec dsh-codex-connect-plus doctor
    ```
 
-6. If the user explicitly requests login, open **Settings → Plugins → Plugin configuration → Codex Connect**, or check `status` and then use `login` or `login --device-code`. OAuth approval belongs to the user.
+6. If the user explicitly requests login, open **Settings → Plugins → Plugin configuration → Codex Connect Plus**, or check `status` and then use `login` or `login --device-code`. OAuth approval belongs to the user.
 
 ## Optional configuration
 
-Use **Settings → Plugins → Plugin configuration → Codex Connect** for live, staged Save/Discard edits. The package row accepts the same `enableSearch` and `enableImageTool` fields as its composition base, both defaulting to `false`. Enabling search registers a provider but does not select it; selecting `web.searchProvider: openai-codex` is a second explicit profile change. Setting `agent-default-model` to `openai-codex` is also a separate explicit change.
+Use **Settings → Plugins → Plugin configuration → Codex Connect Plus** for staged Save/Discard edits. The package row supports `enableSearch` and `enableImageTool` (both default `false`) plus `enableImageGeneration` (default `true`). Enabling search registers a provider but does not select it; selecting `web.searchProvider: openai-codex` is a second explicit profile change. Setting `agent-default-model` to `openai-codex` is also a separate explicit change.
 
 Apply only requested choices and preserve unrelated keys:
 

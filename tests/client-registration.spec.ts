@@ -16,6 +16,15 @@ describe('OpenAI Codex browser contribution', () => {
     expect(client).toContain('createCodexImageLoader(sessions, sessionId)')
   })
 
+  it('keeps the committed browser bundle free of Host-only runtime imports', async () => {
+    const bundle = await readFile(new URL('../lib/client.js', import.meta.url), 'utf8')
+    const requires = [...bundle.matchAll(/require\("([^"]+)"\)/gu)].map(match => match[1])
+    expect(requires).toEqual(['react', 'react/jsx-runtime'])
+    expect(bundle).not.toContain('@deepseek-ai/dsh-attachment')
+    expect(bundle).not.toContain('@deepseek-ai/dsh-tools')
+    expect(bundle).not.toMatch(/node:(?:fs|path|http)/u)
+  })
+
   it('renders a Codex Connect card and uses OpenAI Codex for the Composer provider', async () => {
     const [clientCard, locales, adapter] = await Promise.all([
       readFile(new URL('../src/client/OpenAICodexPluginCard.tsx', import.meta.url), 'utf8'),

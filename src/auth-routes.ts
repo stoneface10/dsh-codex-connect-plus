@@ -9,6 +9,7 @@ import { loginOpenAICodex, logoutOpenAICodex, openAICodexAuthStatus } from './au
 import type { OpenAICodexCredentialStore } from './store.ts'
 import { readOpenAICodexRateLimits } from './usage.ts'
 import type { OpenAICodexUsage } from './usage.ts'
+import { redactProviderDiagnostic } from './redaction.ts'
 import {
   OPENAI_CODEX_AUTH_LOGIN_PATH,
   OPENAI_CODEX_AUTH_LOGOUT_PATH,
@@ -41,10 +42,7 @@ export interface OpenAICodexWebAuthOptions {
 
 /** Redact provider diagnostics before they cross to the browser. */
 function safeMessage(error: unknown): string {
-  return (error instanceof Error ? error.message : String(error))
-    .replace(/\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/gu, '[redacted token]')
-    .replace(/(\b(?:code|token|refresh_token|access_token)=)[^&\s]+/giu, '$1[redacted]')
-    .slice(0, 1000)
+  return redactProviderDiagnostic(error)
 }
 
 /** Reject with the prompt's abort reason while browser callback owns completion. */

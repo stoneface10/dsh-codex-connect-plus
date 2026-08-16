@@ -1,8 +1,8 @@
 /* Adapted for dsh-codex-connect-plus from dsh-image2-draw and codex-gpt-image; Copyright 2026 0751; see THIRD_PARTY_NOTICES.md. */
 /** Harness-native gpt-image-2 generation/edit tools and durable image presentation. */
 
-import { mkdir, writeFile } from 'node:fs/promises'
-import { basename, dirname, join, resolve } from 'node:path'
+import { lstat, mkdir, realpath, writeFile } from 'node:fs/promises'
+import { basename, isAbsolute, join, relative, resolve } from 'node:path'
 import type { Context } from '@deepseek-ai/cordis'
 import type {} from '@deepseek-ai/dsh-fs'
 import { AttachmentId } from '@deepseek-ai/dsh-attachment'
@@ -21,9 +21,8 @@ import {
   requestCodexImages,
 } from './protocol.ts'
 import type { CodexImageMode } from './protocol.ts'
-
-export const CODEX_IMAGE_GENERATE_TOOL_NAME = 'codex_image_generate'
-export const CODEX_IMAGE_EDIT_TOOL_NAME = 'codex_image_edit'
+export { CODEX_IMAGE_EDIT_TOOL_NAME, CODEX_IMAGE_GENERATE_TOOL_NAME } from './contract.ts'
+import { CODEX_IMAGE_EDIT_TOOL_NAME, CODEX_IMAGE_GENERATE_TOOL_NAME } from './contract.ts'
 const OUTPUT_DIR = 'outputs/codex-image'
 const MAX_AGGREGATE_INPUT_BYTES = 32 * 1024 * 1024
 
@@ -73,6 +72,32 @@ function sessionCwd(exec: ToolExecution): string {
 function timestamp(date = new Date()): string {
   const pad = (value: number): string => String(value).padStart(2, '0')
   return `${date.getFullYear()}${pad(date.getMonth() + 1)}${pad(date.getDate())}-${pad(date.getHours())}${pad(date.getMinutes())}${pad(date.getSeconds())}`
+}
+
+/** Create the fixed output directory without following user-controlled links or junctions. */
+export async function ensureSafeCodexImageOutputRoot(cwd: string): Promise<string> {
+  const outputParent = resolve(cwd, 'outputs')
+  const outputRoot = resolve(cwd, OUTPUT_DIR)
+  for (const path of [outputParent, outputRoot]) {
+    let info
+    try {
+      info = await lstat(path)
+    } catch (error: unknown) {
+      if ((error as NodeJS.ErrnoException | null)?.code !== 'ENOENT') throw error
+      try { await mkdir(path) } catch (mkdirError: unknown) {
+        if ((mkdirError as NodeJS.ErrnoException | null)?.code !== 'EEXIST') throw mkdirError
+      }
+      info = await lstat(path)
+    }
+    if (info.isSymbolicLink()) throw new Error(`Codex image output directory must not be a symbolic link or junction: ${path}`)
+    if (!info.isDirectory()) throw new Error(`Codex image output path is not a directory: ${path}`)
+  }
+  const [canonicalCwd, canonicalRoot] = await Promise.all([realpath(cwd), realpath(outputRoot)])
+  const within = relative(canonicalCwd, canonicalRoot)
+  if (within === '..' || within.startsWith(`..${process.platform === 'win32' ? '\\' : '/'}`) || isAbsolute(within)) {
+    throw new Error('Codex image output directory resolves outside the session cwd')
+  }
+  return outputRoot
 }
 
 export async function writeExclusiveCodexImage(path: string, data: Uint8Array): Promise<string> {
@@ -165,14 +190,12 @@ async function executeImage(
     ...mask === undefined ? {} : { mask: { image_url: mask.image_url } },
   })
   const payloads = await requestCodexImages({ auth, mode, body: request, signal: exec.signal })
-  const outputRoot = join(sessionCwd(exec), OUTPUT_DIR)
+  const outputRoot = await ensureSafeCodexImageOutputRoot(sessionCwd(exec))
   const files: string[] = []
   const attachmentValues: CodexImageValueRef[] = []
-  await mkdir(outputRoot, { recursive: true })
   for (const [index, payload] of payloads.entries()) {
     const suffix = payloads.length > 1 ? `-${index + 1}` : ''
     const intended = join(outputRoot, `codex-image-${timestamp()}${suffix}${payload.type.extension}`)
-    await mkdir(dirname(intended), { recursive: true })
     const file = await writeExclusiveCodexImage(intended, payload.data)
     files.push(file)
     const saved = await ctx.attachments.saveImage({

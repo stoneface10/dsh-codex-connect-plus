@@ -35,7 +35,8 @@ declare class OpenAICodexCredentialStore implements CredentialStore {
   delete(providerId: string): Promise<void>;
 }
 //#endregion
-//#region src/images/tools.d.ts
+//#region src/images/contract.d.ts
+/** Stable model-facing tool names shared by Host and browser code. */
 declare const CODEX_IMAGE_GENERATE_TOOL_NAME = "codex_image_generate";
 declare const CODEX_IMAGE_EDIT_TOOL_NAME = "codex_image_edit";
 //#endregion

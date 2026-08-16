@@ -19,22 +19,16 @@
 
 ## 安装
 
-发布 npm 后：
+本包尚未发布到 npm。请从包含 `lib/` 构建产物的不可变 GitHub tag 安装：
 
 ```sh
-dsh plugin --profile web add dsh-codex-connect-plus@alpha
-```
-
-从包含 `lib/` 构建产物的 GitHub tag 安装：
-
-```sh
-dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.1'
+dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.2'
 ```
 
 从 GitHub Release 下载 `.tgz` 后：
 
 ```sh
-dsh plugin --profile web add /path/to/dsh-codex-connect-plus-0.1.0-alpha.1.tgz
+dsh plugin --profile web add /path/to/dsh-codex-connect-plus-0.1.0-alpha.2.tgz
 ```
 
 本地开发链接：
@@ -83,13 +77,13 @@ outputs/codex-image/
 
 ## 安全与接口状态
 
-- OAuth 凭据继续存放在 DSH 原有的 owner-only 凭据文件中。
-- Token 刷新由 pi-ai Codex provider 在文件锁内完成，图片模块不自行实现刷新接口。
-- 图片请求只允许固定 HTTPS Codex 应用端点，并设置 `redirect: error`。
-- 对外错误会隐藏 Token、JWT、Authorization 和 Base64 图片数据。
-- 图片附件通过所属 DSH 会话授权读取，不提供公开附件读取路由。
+- OAuth 凭据保存在 DSH 专用凭据文件中；在 POSIX 系统上，插件会检查仅所有者可访问权限。请勿复制、提交或公开该文件。
+- Token 刷新由 pi-ai Codex provider 通过带锁的凭据存储完成；图片模块本身不保存或刷新 Refresh Token。
+- 图片请求只发送到代码中固定的 HTTPS ChatGPT/Codex 应用端点，并拒绝 HTTP 重定向。
+- 对外显示提供商错误前，会限制错误长度，并隐藏已识别的 Bearer Token、JWT、授权/Token 字段、`b64_json` 和图片 Data URL。
+- 生成图片附件只能通过所属 DSH 会话授权读取；插件不提供公开附件读取接口。
 
-Codex Images 应用后端不被描述为公开或受支持的 OpenAI Platform API。它可能变化，实际可用性受账号、订阅、地区、额度和上游行为影响。
+Codex Images 使用未公开、可能变化的 ChatGPT/Codex 应用后端，并非 OpenAI Platform 的公开或受支持 API。功能可能随上游变更而失效；实际可用性取决于账号权限、订阅、地区、额度和上游策略。使用者应自行遵守适用的服务条款。
 
 ## 开发与发布
 

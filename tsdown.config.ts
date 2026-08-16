@@ -5,19 +5,21 @@ const PLUGIN_ID = 'dsh-codex-connect-plus'
 const PACKAGE_VERSION = (JSON.parse(
   readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
 ) as { version: string }).version
+// Must stay aligned with DSH's browser module table. Any other @deepseek-ai
+// runtime value import is a Host/client boundary violation and fails the build.
 const CLIENT_EXTERNALS = [
   'react',
   'react/jsx-runtime',
   'react-dom',
   'react-dom/client',
   '@deepseek-ai/cordis',
-  '@deepseek-ai/dsh-api-remotes/client',
-  '@deepseek-ai/dsh-client-connection/client',
-  '@deepseek-ai/dsh-client-runtime/client',
-  '@deepseek-ai/dsh-client-ui-settings/client',
-  '@deepseek-ai/dsh-client-ui-tool/client',
-  '@deepseek-ai/dsh-client-ui-attachment',
   '@deepseek-ai/dsh-client-ui-slots',
+  '@deepseek-ai/dsh-client-web-react',
+  '@deepseek-ai/dsh-client-ui-primitives',
+  '@deepseek-ai/dsh-client-ui-attachment',
+  '@deepseek-ai/dsh-client-schema-form',
+  // Temporary DSH runtime-store exemption used by the current web shell.
+  '@deepseek-ai/dsh-client-runtime/client',
 ] as const
 
 export default [
@@ -66,7 +68,22 @@ export default [
     platform: 'browser',
     dts: false,
     clean: false,
-    deps: { neverBundle: [...CLIENT_EXTERNALS] },
+    deps: {
+      neverBundle: [...CLIENT_EXTERNALS],
+      // Dependencies outside the frozen browser module table must be bundled.
+      alwaysBundle: (id: string) => !CLIENT_EXTERNALS.includes(id as typeof CLIENT_EXTERNALS[number]),
+    },
+    plugins: [{
+      name: 'dsh-client-bundle-purity',
+      resolveId(source: string) {
+        if (!source.startsWith('@deepseek-ai/')) return null
+        if (CLIENT_EXTERNALS.includes(source as typeof CLIENT_EXTERNALS[number])) return null
+        throw new Error(
+          `client bundle purity: "${source}" is not in the DSH browser module table; `
+          + 'runtime cross-plugin and Host-only imports are forbidden (type-only imports are allowed)',
+        )
+      },
+    }],
     define: {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV ?? 'production'),
       __CODEX_CONNECT_VERSION__: JSON.stringify(PACKAGE_VERSION),

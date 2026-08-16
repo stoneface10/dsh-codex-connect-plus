@@ -2,6 +2,8 @@
 /** Fixed Codex Images JSON protocol, validation, limits, and redacted failures. */
 
 import type { OpenAICodexAuthRuntime } from '../auth-runtime.ts'
+import { CODEX_CONNECT_VERSION } from '../version.ts'
+import { redactProviderDiagnostic } from '../redaction.ts'
 
 export const CODEX_IMAGE_MODEL = 'gpt-image-2'
 export const CODEX_IMAGE_GENERATE_URL = 'https://chatgpt.com/backend-api/codex/images/generations'
@@ -12,6 +14,8 @@ export const CODEX_IMAGE_MAX_ERROR_BYTES = 64 * 1024
 export const CODEX_IMAGE_MAX_OUTPUT_BYTES = 32 * 1024 * 1024
 export const CODEX_IMAGE_MAX_INPUT_BYTES = 4 * 1024 * 1024
 export const CODEX_IMAGE_MAX_INPUTS = 8
+export const CODEX_IMAGE_MAX_PROMPT_CHARS = 32_000
+export const CODEX_IMAGE_MAX_OUTPUTS = 4
 
 const MIN_PIXELS = 655_360
 const MAX_PIXELS = 8_294_400
@@ -136,6 +140,7 @@ export function createCodexImageRequest(input: {
 }): CodexImageRequest {
   const prompt = input.prompt.trim()
   if (prompt.length === 0) throw new Error('prompt must not be empty')
+  if (prompt.length > CODEX_IMAGE_MAX_PROMPT_CHARS) throw new Error(`prompt must not exceed ${CODEX_IMAGE_MAX_PROMPT_CHARS} characters`)
   const count = input.count ?? 1
   if (!Number.isInteger(count) || count < 1 || count > 4) throw new Error('count must be an integer from 1 to 4')
   return {
@@ -215,11 +220,7 @@ export function safeCodexImageHttpError(status: number, body: Uint8Array): Error
   }
   let detail = Buffer.from(body).toString('utf8').slice(0, 1000)
   try { detail = JSON.stringify(JSON.parse(detail)).slice(0, 1000) } catch {}
-  detail = detail
-    .replace(/\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/gu, '[redacted token]')
-    .replace(/("?(?:access|refresh|token|authorization)"?\s*[:=]\s*")([^"\s]+)/giu, '$1[redacted]')
-    .replace(/Bearer\s+[A-Za-z0-9._~+/=-]+/giu, 'Bearer [redacted]')
-    .replace(/data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+/=]+/giu, '[redacted image data]')
+  detail = redactProviderDiagnostic(detail)
   return new Error(`Codex Images request failed (HTTP ${status})${detail.length === 0 ? '' : `: ${detail}`}`)
 }
 
@@ -241,6 +242,7 @@ export function decodeCodexImageResponse(value: unknown): DecodedCodexImage[] {
   const images: DecodedCodexImage[] = []
   for (const item of value['data']) {
     if (!isRecord(item) || typeof item['b64_json'] !== 'string') continue
+    if (images.length >= CODEX_IMAGE_MAX_OUTPUTS) throw new Error(`Codex Images returned more than ${CODEX_IMAGE_MAX_OUTPUTS} images`)
     const data = strictBase64(item['b64_json'])
     const type = detectCodexImageType(data)
     images.push({
@@ -275,7 +277,7 @@ export async function requestCodexImages(options: {
           accept: 'application/json',
           'content-type': 'application/json',
           originator: 'dsh-codex-connect-plus',
-          'user-agent': 'dsh-codex-connect-plus/0.1.0',
+          'user-agent': `dsh-codex-connect-plus/${CODEX_CONNECT_VERSION}`,
         },
         body: JSON.stringify(options.body),
         signal: timeout.signal,

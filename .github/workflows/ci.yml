@@ -11,7 +11,12 @@ permissions:
 
 jobs:
   validate:
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22.19.0', '24']
     runs-on: ubuntu-latest
+    name: Validate (Node ${{ matrix.node }})
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -19,16 +24,26 @@ jobs:
           version: 10.30.3
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: ${{ matrix.node }}
       - run: pnpm --config.minimum-release-age=0 install --frozen-lockfile
       - name: Lint package and source hygiene
         run: pnpm run lint
       - name: Typecheck host and browser entries
         run: pnpm run typecheck
-      - name: Test
-        run: pnpm run test
-      - name: Build
+      - name: Build committed artifacts
         run: pnpm run build
+      - name: Reject stale or untracked generated artifacts
+        shell: bash
+        run: |
+          if [[ -n "$(git status --porcelain --untracked-files=all -- lib)" ]]; then
+            git status --short --untracked-files=all -- lib
+            git diff -- lib
+            exit 1
+          fi
+      - name: Validate browser bundle module table
+        run: pnpm run client:check
+      - name: Test rebuilt artifacts
+        run: pnpm run test
       - name: Validate package contents
         run: pnpm run pack:check
 

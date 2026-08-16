@@ -31,6 +31,7 @@ describe('Codex Images protocol', () => {
       model: 'gpt-image-2', n: 1, size: '1024x1024', output_format: 'png', quality: 'auto',
     })
     expect(() => createCodexImageRequest({ prompt: ' ' })).toThrow(/prompt/u)
+    expect(() => createCodexImageRequest({ prompt: 'x'.repeat(32_001) })).toThrow(/32000/u)
     expect(() => createCodexImageRequest({ prompt: 'test', count: 5 })).toThrow(/1 to 4/u)
     expect(() => createCodexImageRequest({ prompt: 'test', quality: 'ultra' })).toThrow(/quality/u)
     expect(() => createCodexImageRequest({ prompt: 'test', background: 'transparent' })).toThrow(/background/u)
@@ -43,6 +44,7 @@ describe('Codex Images protocol', () => {
     expect(decoded[0]?.revisedPrompt).toBe('better')
     expect(() => decodeCodexImageResponse({ data: [{ b64_json: 'not base64' }] })).toThrow(/base64/u)
     expect(() => decodeCodexImageResponse({ data: [{ b64_json: Buffer.from('text').toString('base64') }] })).toThrow(/unrecognized/u)
+    expect(() => decodeCodexImageResponse({ data: Array.from({ length: 5 }, () => ({ b64_json: Buffer.from(png).toString('base64') })) })).toThrow(/more than 4/u)
   })
 
   it('uses the fixed endpoint, refreshed auth, JSON body, and no redirects', async () => {
@@ -53,6 +55,7 @@ describe('Codex Images protocol', () => {
       expect(headers.get('authorization')).toBe('Bearer secret-access-token')
       expect(headers.get('chatgpt-account-id')).toBe('acct-123')
       expect(headers.get('content-type')).toBe('application/json')
+      expect(headers.get('user-agent')).toBe('dsh-codex-connect-plus/0.1.0-alpha.2')
       expect(String(init?.body)).not.toContain('refresh')
       return new Response(JSON.stringify({ data: [{ b64_json: Buffer.from(png).toString('base64') }] }), {
         status: 200,
@@ -70,8 +73,10 @@ describe('Codex Images protocol', () => {
   })
 
   it('redacts provider-controlled secrets and does not retry failures', async () => {
-    const message = safeCodexImageHttpError(500, Buffer.from('{"token":"abc","error":"Bearer xyz","image":"data:image/png;base64,AAAA"}')).message
+    const message = safeCodexImageHttpError(500, Buffer.from('{"access_token":"abc","refresh_token":"def","b64_json":"QUJDRA==","error":"Bearer xyz","image":"data:image/png;base64,AAAA"}')).message
     expect(message).not.toContain('abc')
+    expect(message).not.toContain('def')
+    expect(message).not.toContain('QUJDRA==')
     expect(message).not.toContain('Bearer xyz')
     expect(message).not.toContain('base64,AAAA')
     const fetchMock = vi.fn(async () => new Response('{"error":"failed"}', { status: 500 }))

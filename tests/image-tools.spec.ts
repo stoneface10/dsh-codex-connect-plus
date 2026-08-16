@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm } from 'node:fs/promises'
+import { mkdir, mkdtemp, readFile, rm, symlink } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import type { Context } from '@deepseek-ai/cordis'
@@ -8,6 +8,7 @@ import type { OpenAICodexAuthRuntime } from '../src/auth-runtime.ts'
 import {
   CODEX_IMAGE_EDIT_TOOL_NAME,
   CODEX_IMAGE_GENERATE_TOOL_NAME,
+  ensureSafeCodexImageOutputRoot,
   registerCodexImageTools,
   writeExclusiveCodexImage,
 } from '../src/images/tools.ts'
@@ -45,6 +46,30 @@ describe('Codex image tools', () => {
       mode: 'generate',
     })
     expect(content?.some(block => block.type === 'image')).toBe(true)
+  })
+
+  it('rejects a linked output parent instead of writing outside the session cwd', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'dsh-codex-connect-plus-output-root-'))
+    const outside = await mkdtemp(join(tmpdir(), 'dsh-codex-connect-plus-output-outside-'))
+    try {
+      await symlink(outside, join(root, 'outputs'), process.platform === 'win32' ? 'junction' : 'dir')
+      await expect(ensureSafeCodexImageOutputRoot(root)).rejects.toThrow(/symbolic link or junction/u)
+    } finally {
+      await Promise.all([
+        rm(root, { recursive: true, force: true }),
+        rm(outside, { recursive: true, force: true }),
+      ])
+    }
+  })
+
+  it('creates a normal contained output directory', async () => {
+    const root = await mkdtemp(join(tmpdir(), 'dsh-codex-connect-plus-output-root-'))
+    try {
+      expect(await ensureSafeCodexImageOutputRoot(root)).toBe(join(root, 'outputs', 'codex-image'))
+      await expect(mkdir(join(root, 'outputs', 'codex-image'))).rejects.toMatchObject({ code: 'EEXIST' })
+    } finally {
+      await rm(root, { recursive: true, force: true })
+    }
   })
 
   it('allocates output filenames atomically instead of overwriting concurrent results', async () => {

@@ -19,22 +19,16 @@ Connect a user-authorized ChatGPT subscription to DeepSeek Harness for Codex mod
 
 ## Install
 
-From npm after a release:
+The package is not yet published to npm. Install the immutable GitHub tag containing committed `lib/` artifacts:
 
 ```sh
-dsh plugin --profile web add dsh-codex-connect-plus@alpha
-```
-
-From a GitHub tag containing committed `lib/` artifacts:
-
-```sh
-dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.1'
+dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.2'
 ```
 
 From a downloaded GitHub Release package:
 
 ```sh
-dsh plugin --profile web add /path/to/dsh-codex-connect-plus-0.1.0-alpha.1.tgz
+dsh plugin --profile web add /path/to/dsh-codex-connect-plus-0.1.0-alpha.2.tgz
 ```
 
 For local development:
@@ -85,13 +79,13 @@ Reference images are limited to 4 MB each and 8 images per edit request. Generat
 
 ## Security and API status
 
-- OAuth credentials remain in the existing owner-only DSH credential store.
-- Refresh is performed by the pi-ai Codex provider under the store's lock; the image module never implements a token refresh endpoint.
-- Image requests use fixed HTTPS Codex application endpoints and `redirect: error`.
-- Tokens, JWTs, base64 image data, and authorization headers are redacted from surfaced provider errors.
-- Generated attachment reads are scoped through the owning DSH session.
+- OAuth credentials remain in DSH's dedicated credential file. On POSIX systems the plugin checks owner-only permissions; do not copy, commit, or disclose this file.
+- Refresh is performed by the pi-ai Codex provider through the locked credential store; the image module neither stores nor refreshes refresh tokens itself.
+- Image requests use fixed HTTPS ChatGPT/Codex application endpoints and reject HTTP redirects.
+- Before provider-controlled errors are surfaced, their length is bounded and recognized Bearer tokens, JWTs, authorization/token fields, `b64_json`, and image data URLs are redacted.
+- Generated attachment reads are authorized through the owning DSH session; the plugin exposes no public attachment-reading route.
 
-The Codex Images application backend is not presented as a public or supported OpenAI Platform API. It may change, and availability depends on the user's account, subscription, region, limits, and upstream behavior.
+Codex Images uses an unpublished, changeable ChatGPT/Codex application backend, not a public or supported OpenAI Platform API. The feature may stop working after upstream changes; availability depends on the user's account permissions, subscription, region, limits, and upstream policy. Users are responsible for complying with applicable service terms.
 
 ## Development
 

@@ -2,7 +2,7 @@
   "name": "dsh-codex-connect-plus",
   "displayName": "Codex Connect Plus",
   "description": "ChatGPT OAuth, Codex models, search, vision, and gpt-image-2 generation for DeepSeek Harness.",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "author": "0751",
   "contributors": [
     "Frank Song (dsh-codex-connect author)",
@@ -48,8 +48,9 @@
     "build": "tsdown",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.client.json",
+    "client:check": "node scripts/check-client-bundle.mjs",
     "pack:check": "node scripts/check-pack.mjs",
-    "check": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build && pnpm run pack:check",
+    "check": "pnpm run lint && pnpm run typecheck && pnpm run build && pnpm run client:check && pnpm run test && pnpm run pack:check",
     "prepublishOnly": "pnpm --config.minimum-release-age=0 run check"
   },
   "exports": {

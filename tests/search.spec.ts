@@ -187,6 +187,12 @@ describe('OpenAI Codex standalone search failures', () => {
     await expect(search.search({ query: 'q' }))
       .rejects.toThrow(expect.objectContaining({ code: 'WEB_PROVIDER_CREDENTIAL_MISSING' }))
 
+    vi.stubGlobal('fetch', vi.fn(async () => jsonResponse({ error: { message: 'Bearer bearer-secret access_token=opaque-secret' } }, 500)))
+    const redacted: unknown = await search.search({ query: 'q' }).catch((error: unknown) => error)
+    expect(redacted).toBeInstanceOf(Error)
+    expect((redacted as Error).message).not.toContain('bearer-secret')
+    expect((redacted as Error).message).not.toContain('opaque-secret')
+
     vi.stubGlobal('fetch', vi.fn(async () => new Response('not-json', { status: 200 })))
     await expect(search.search({ query: 'q' }))
       .rejects.toThrow(expect.objectContaining({ code: 'WEB_PROVIDER_ERROR' }))

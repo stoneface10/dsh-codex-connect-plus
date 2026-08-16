@@ -23,6 +23,7 @@ import {
   DEFAULT_OPENAI_CODEX_SEARCH_MODEL,
 } from './settings-contract.ts'
 import type { OpenAICodexSearchContextSize, OpenAICodexSearchMode } from './settings-contract.ts'
+import { redactProviderDiagnostic } from './redaction.ts'
 
 export {
   DEFAULT_OPENAI_CODEX_SEARCH_CONTEXT_SIZE,
@@ -217,7 +218,7 @@ function providerMessage(value: unknown): string | undefined {
     : isRecord(error) && typeof error['message'] === 'string'
       ? error['message']
       : typeof value['message'] === 'string' ? value['message'] : undefined
-  return raw?.replace(/\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/gu, '[REDACTED]').slice(0, 1000)
+  return raw === undefined ? undefined : redactProviderDiagnostic(raw)
 }
 
 /** OpenAI Codex standalone-search provider using the same refreshable OAuth store as the LLM route. */
