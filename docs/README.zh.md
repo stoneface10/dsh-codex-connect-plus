@@ -1,8 +1,29 @@
 # Codex Connect Plus
 
+[![Release](https://img.shields.io/github/v/release/stoneface10/dsh-codex-connect-plus?include_prereleases&label=release)](https://github.com/stoneface10/dsh-codex-connect-plus/releases)
+[![License](https://img.shields.io/github/license/stoneface10/dsh-codex-connect-plus)](../LICENSE)
+
 [English](../README.md) | 中文
 
-通过用户授权的 ChatGPT/Codex OAuth，将 Codex 模型、可选搜索与视觉能力、`gpt-image-2` 文生图和图片编辑接入 DeepSeek Harness，无需 OpenAI Platform API Key。
+<p align="center">
+  <img src="assets/hero.jpg" alt="Codex Connect Plus：使用 ChatGPT 订阅调用 Codex 模型和 gpt-image-2，无需 OpenAI Platform API Key" width="100%">
+</p>
+
+> **把你的 ChatGPT/Codex 订阅接入 DeepSeek Harness：直接选择 Codex 模型，并使用 `gpt-image-2` 文生图/编辑，无需 OpenAI Platform API Key。**
+
+只需完成一次 ChatGPT OAuth 登录。Codex 模型请求使用已登录账户的订阅额度；图片生成/编辑使用同一 OAuth 会话，但实际可用性和额度可能由账户、地区、限制及上游策略分别决定。
+
+### 一眼看懂
+
+- **Codex 模型进入 DSH 普通模型选择器**：无需额外切换到 Codex CLI 工作流。
+- **`gpt-image-2` 文生图与图片编辑**：可从提示词生成图片，也可编辑 1–8 张本地参考图；结果在聊天内预览并保存到本地。
+- **无需 OpenAI Platform API Key 或按量 API 计费配置**：授权来自用户主动登录的 ChatGPT/Codex OAuth 会话。
+- **默认节省订阅额度**：模型自动重试默认为 `0`，图片请求不会静默重试。
+
+<p align="center">
+  <img src="assets/demo-codex-image-and-models.png" alt="DeepSeek Harness 中选择 Codex 模型并使用 gpt-image-2 文生图的真实界面" width="920">
+</p>
+<p align="center"><sub>真实 DSH 界面：在同一会话中选择 Codex 模型，并通过 <code>gpt-image-2</code> 生成聊天附件。</sub></p>
 
 > 社区派生版本，与 OpenAI、DeepSeek 以及上游 Codex Connect 维护者不存在隶属或背书关系。
 

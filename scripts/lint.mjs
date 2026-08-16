@@ -49,7 +49,10 @@ for (const filename of ['src/images/protocol.ts', 'src/images/tools.ts', 'src/cl
 }
 
 const readme = await readFile(new URL('../README.md', import.meta.url), 'utf8')
-if (!readme.startsWith('# Codex Connect Plus\n\nEnglish | [中文](docs/README.zh.md)\n')) failures.push('README opening mismatch')
+if (!readme.startsWith('# Codex Connect Plus\n')) failures.push('README opening mismatch')
+if (!readme.includes('English | [中文](docs/README.zh.md)')) failures.push('README must link the Chinese guide')
+if (!readme.includes('<img src="docs/assets/hero.jpg"')) failures.push('README must display the product hero')
+if (!readme.includes('<img src="docs/assets/demo-codex-image-and-models.png"')) failures.push('README must display the real Codex and image-generation demo')
 if (!readme.includes(`github:stoneface10/dsh-codex-connect-plus#v${packageJson.version}`)) failures.push('README must pin the current GitHub release tag')
 if (!readme.includes('not yet published to npm')) failures.push('README must not advertise an unpublished npm package')
 const chinese = await readFile(new URL('../docs/README.zh.md', import.meta.url), 'utf8')

@@ -1,7 +1,7 @@
 {
   "name": "dsh-codex-connect-plus",
   "displayName": "Codex Connect Plus",
-  "description": "ChatGPT OAuth, Codex models, search, vision, and gpt-image-2 generation for DeepSeek Harness.",
+  "description": "Use ChatGPT/Codex subscription access in DeepSeek Harness for Codex models and gpt-image-2 generation/editing—no OpenAI Platform API key.",
   "version": "0.1.0-alpha.3",
   "author": "0751",
   "contributors": [

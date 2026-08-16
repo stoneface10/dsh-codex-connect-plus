@@ -1,8 +1,29 @@
 # Codex Connect Plus
 
+[![Release](https://img.shields.io/github/v/release/stoneface10/dsh-codex-connect-plus?include_prereleases&label=release)](https://github.com/stoneface10/dsh-codex-connect-plus/releases)
+[![License](https://img.shields.io/github/license/stoneface10/dsh-codex-connect-plus)](LICENSE)
+
 English | [中文](docs/README.zh.md)
 
-Connect a user-authorized ChatGPT subscription to DeepSeek Harness for Codex models, optional search and vision, and `gpt-image-2` generation/editing without an OpenAI Platform API key.
+<p align="center">
+  <img src="docs/assets/hero.jpg" alt="Codex Connect Plus — ChatGPT subscription to Codex models and gpt-image-2 without an OpenAI Platform API key" width="100%">
+</p>
+
+> **Use your ChatGPT/Codex subscription inside DeepSeek Harness for Codex models and `gpt-image-2` generation/editing—without an OpenAI Platform API key.**
+
+Sign in once with ChatGPT OAuth. Codex model requests use the signed-in account's subscription capacity; image generation/editing uses the same OAuth session and remains subject to account availability, region, limits, and upstream policy.
+
+### What you get
+
+- **Codex models in the normal DSH model picker** — no separate CLI workflow.
+- **`gpt-image-2` generation and editing** — create images from prompts or edit 1–8 local references, with inline previews and local output files.
+- **No OpenAI Platform API key or pay-as-you-go API billing setup** — authorization comes from your user-approved ChatGPT/Codex OAuth session.
+- **Quota-conscious defaults** — automatic model retries default to `0`, and image requests are never silently retried.
+
+<p align="center">
+  <img src="docs/assets/demo-codex-image-and-models.png" alt="Real DeepSeek Harness UI showing Codex model selection and gpt-image-2 image generation" width="920">
+</p>
+<p align="center"><sub>Real DSH UI: select a Codex model and generate an attached image with <code>gpt-image-2</code> in the same conversation.</sub></p>
 
 > Community derivative. Not affiliated with or endorsed by OpenAI, DeepSeek, or the upstream Codex Connect maintainers.
 
