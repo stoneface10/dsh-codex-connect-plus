@@ -1,10 +1,10 @@
-# Codex Connect：Alpha 设计
+# Codex Connect Plus：Alpha 设计
 
 ## 所有权与组合
 
 本包通过 Harness 公共 `LlmRuntime` 与 `PiAiAdapter` 注册 `openai-codex`。主模型路径不是一次性 subagent，而是标准 Harness agent loop，因此原生工具审批、权限策略、流式输出、附件解析、reasoning replay、会话持久化、压缩与恢复均保持有效。
 
-bundle patch 只插入 `llm-openai-codex`，不会写入 `agent-default-model` 或 `web.searchProvider`。`enableSearch` 与 `enableImageTool` 默认均为 `false`；关闭时不会注册对应可选服务。
+bundle patch 只插入 `llm-openai-codex`，不会写入 `agent-default-model` 或 `web.searchProvider`。`enableSearch` 与 `enableImageTool` 默认均为 `false`，`enableImageGeneration` 默认为 `true`；关闭时不会注册对应可选服务，图片能力激活失败也不会阻止 Codex 模型适配器加载。
 
 Host 将 `llm-openai-codex` 注册为插件自有 settings namespace，并在 LLM 可配置 provider 目录中声明显示名为 `OpenAI Codex`。浏览器通过 Harness settings-scope transport 绑定该 namespace，把账户、额度以及带保存/放弃的能力配置放在现有“插件配置”卡片中。带 revision 防护的逐字段写入不会覆盖无关设置；提交后会即时协调搜索与图片能力的注册状态，且绝不写入默认模型或全局搜索 namespace。
 
@@ -17,6 +17,8 @@ Host 将 `llm-openai-codex` 注册为插件自有 settings namespace，并在 LL
 ## 搜索与图片
 
 仅当 `enableSearch: true` 时注册 Codex 独立搜索提供方和不含凭据的请求事件。多 provider 环境仍需显式设置 `web.searchProvider: openai-codex`。仅当 `enableImageTool: true` 且 tools、filesystem、attachments 服务存在时注册 `view_image`。本地文件继续受 Harness 文件系统边界与大小限制；远程图片只允许不含凭据的公共 HTTP(S)，所有 DNS 结果必须是公共单播地址，每次重定向都会重新验证，并把实际连接固定到已验证地址以关闭 DNS rebinding 缺口。
+
+当 `enableImageGeneration: true` 时注册 `codex_image_generate` 与 `codex_image_edit`。它们与模型适配器共享 provider 原生 OAuth runtime；请求仅发送到固定 HTTPS Codex 应用端点，禁止重定向，传递取消信号，限制为十分钟超时和有界字节，并且不对结果不确定的失败自动重试。输出写入会话 cwd，并在工具结果提交前保存为 Harness 附件，回放时通过所属会话的授权附件 API 读取。
 
 ## 冲突、诊断与兼容边界
 

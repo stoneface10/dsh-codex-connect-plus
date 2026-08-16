@@ -1,15 +1,32 @@
-dsh-codex-connect
+dsh-codex-connect-plus
+Copyright 2026 0751
+
+This product includes software derived from dsh-codex-connect:
+https://github.com/franksong2702/dsh-codex-connect
 Copyright 2026 Frank Song
 
-This product includes software derived from Yan-Zero/dsh-codex:
+That work includes software derived from Yan-Zero/dsh-codex:
 https://github.com/Yan-Zero/dsh-codex
 Copyright 2026 Yan-Zero
 
-Modifications and additional work for Codex Connect are Copyright 2026
-Frank Song. They include a distinct package identity, opt-in routing and
-capabilities, secret-free diagnostics, provider-conflict guidance, migration
-documentation, security hardening, live plugin configuration, and Alpha
-release validation.
+Modifications and additional work for dsh-codex-connect-plus are Copyright
+2026 0751. Modified source files are identified in their source headers and
+generated build artifacts carry a derivative notice. The derivative starts
+from dsh-codex-connect tag v0.1.0-alpha.4.5
+(commit 2c99d177db51bfa18683b4e3c13d125ec0200367).
 
-The upstream material and the Codex Connect modifications are distributed
-under the Apache License, Version 2.0 included in LICENSE.
+This product also includes or adapts MIT-licensed portions of:
+
+- dsh-image2-draw, https://github.com/JuneLearn/dsh-image2-draw
+  Copyright (c) 2026 JuneLearn
+
+- codex-gpt-image, https://github.com/ningzimu/codex-gpt-image
+  Copyright (c) 2026 ningzimu
+
+- dsh-multimodal, https://github.com/MC5lan/dsh-multimodal
+  Copyright (c) 2026 dsh-multimodal contributors
+
+The dsh-codex-connect-derived material and the dsh-codex-connect-plus
+modifications are distributed under the Apache License, Version 2.0 included
+in LICENSE. Full notices for adapted MIT-licensed material are reproduced in
+THIRD_PARTY_NOTICES.md.

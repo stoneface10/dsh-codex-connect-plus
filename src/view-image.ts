@@ -1,3 +1,4 @@
+/* Modified from dsh-codex-connect by 0751 for dsh-codex-connect-plus; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /** Codex-compatible `view_image` tool for local paths and HTTP(S) URLs. */
 
 import { basename } from 'node:path'
@@ -156,7 +157,7 @@ export function viewImageTool(ctx: Context): ToolDefinition {
       if (exec.parent !== undefined) {
         exec.deferContext(createUserMessage({
           content: contentOf(value),
-          source: { kind: 'plugin', plugin: 'dsh-codex-connect' },
+          source: { kind: 'plugin', plugin: 'dsh-codex-connect-plus' },
         }))
       }
       return value

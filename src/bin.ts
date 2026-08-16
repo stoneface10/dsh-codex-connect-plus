@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* Modified from dsh-codex-connect by 0751 for dsh-codex-connect-plus; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /** Standalone credential CLI for the optional OpenAI Codex bundle. */
 
 import { spawn } from 'node:child_process'
@@ -89,7 +90,7 @@ async function answerPrompt(
 /** Print the standalone command help. */
 function printHelp(): void {
   process.stdout.write([
-    'Usage: dsh-codex-connect <doctor|login|logout|status> [--device-code]',
+    'Usage: dsh-codex-connect-plus <doctor|login|logout|status> [--device-code]',
     '',
     '  doctor         inspect secret-free runtime and OAuth file metadata',
     '  login          sign in with a separate ChatGPT OAuth session',
@@ -108,13 +109,13 @@ export async function run(argv: readonly string[]): Promise<number> {
   }
   const [rawAction, ...flags] = argv
   if (rawAction !== 'doctor' && rawAction !== 'login' && rawAction !== 'logout' && rawAction !== 'status') {
-    process.stderr.write(`dsh-codex-connect: expected doctor, login, logout, or status; got ${JSON.stringify(rawAction)}\n`)
+    process.stderr.write(`dsh-codex-connect-plus: expected doctor, login, logout, or status; got ${JSON.stringify(rawAction)}\n`)
     return 1
   }
   const action: Action = rawAction
   const unknown = flags.filter(flag => flag !== '--device-code')
   if (unknown.length > 0 || (flags.includes('--device-code') && action !== 'login')) {
-    process.stderr.write(`dsh-codex-connect: invalid options for ${action}: ${flags.join(' ')}\n`)
+    process.stderr.write(`dsh-codex-connect-plus: invalid options for ${action}: ${flags.join(' ')}\n`)
     return 1
   }
   try {
@@ -122,9 +123,9 @@ export async function run(argv: readonly string[]): Promise<number> {
       case 'doctor': {
         const report = await diagnoseOpenAICodex()
         process.stdout.write([
-          `Codex Connect ${report.version} on ${report.node}`,
+          `Codex Connect Plus ${report.version} on ${report.node}`,
           `OAuth file metadata: ${report.credentialFile.state} (${report.credentialFile.path})`,
-          `Optional capability defaults: search=${report.capabilities.search ? 'enabled' : 'disabled'}, imageTool=${report.capabilities.imageTool ? 'enabled' : 'disabled'}`,
+          `Optional capability defaults: search=${report.capabilities.search ? 'enabled' : 'disabled'}, imageTool=${report.capabilities.imageTool ? 'enabled' : 'disabled'}, imageGeneration=${report.capabilities.imageGeneration ? 'enabled' : 'disabled'}`,
           'Harness defaults: unchanged by this plugin',
           ...report.hints.map(hint => `Hint: ${hint}`),
           '',
@@ -136,19 +137,19 @@ export async function run(argv: readonly string[]): Promise<number> {
       case 'status': {
         const status = await openAICodexAuthStatus()
         if (!status.authenticated) {
-          process.stdout.write('Codex Connect: signed out\n')
+          process.stdout.write('Codex Connect Plus: signed out\n')
           return 1
         }
         const expires = status.expiresAt
         const suffix = expires === undefined || Number.isNaN(expires.valueOf())
           ? ''
           : `; access token expires ${expires.toISOString()} (refresh is automatic)`
-        process.stdout.write(`Codex Connect: signed in${suffix}\n`)
+        process.stdout.write(`Codex Connect Plus: signed in${suffix}\n`)
         return 0
       }
       case 'logout':
         await logoutOpenAICodex()
-        process.stdout.write(`Codex Connect: signed out; removed ${openAICodexAuthPath()}\n`)
+        process.stdout.write(`Codex Connect Plus: signed out; removed ${openAICodexAuthPath()}\n`)
         return 0
       case 'login': {
         const readline = createInterface({ input: process.stdin, output: process.stdout })
@@ -160,12 +161,12 @@ export async function run(argv: readonly string[]): Promise<number> {
         } finally {
           readline.close()
         }
-        process.stdout.write(`Codex Connect: signed in; credentials saved to ${openAICodexAuthPath()}\n`)
+        process.stdout.write(`Codex Connect Plus: signed in; credentials saved to ${openAICodexAuthPath()}\n`)
         return 0
       }
     }
   } catch (error: unknown) {
-    process.stderr.write(`dsh-codex-connect: ${action} failed: ${safeMessage(error)}\n`)
+    process.stderr.write(`dsh-codex-connect-plus: ${action} failed: ${safeMessage(error)}\n`)
     return 1
   }
 }

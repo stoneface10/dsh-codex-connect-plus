@@ -1,6 +1,7 @@
+/* Modified from dsh-codex-connect by 0751 for dsh-codex-connect-plus; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /**
  * OpenAI Codex standalone web search over the dsh web provider seam.
- * @module dsh-codex-connect/search
+ * @module dsh-codex-connect-plus/search
  */
 
 import { createModels } from '@earendil-works/pi-ai'

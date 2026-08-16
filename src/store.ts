@@ -1,6 +1,7 @@
+/* Modified from dsh-codex-connect by 0751 for dsh-codex-connect-plus; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /**
  * Owner-only persistent OAuth credential storage for the OpenAI Codex bundle.
- * @module dsh-codex-connect/store
+ * @module dsh-codex-connect-plus/store
  */
 
 import { mkdir, readFile, rm, stat } from 'node:fs/promises'

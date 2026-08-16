@@ -1,13 +1,12 @@
+/* Modified from dsh-codex-connect by 0751 for dsh-codex-connect-plus; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /** OpenAI Codex adapter assembled from public dsh-llm-pi-ai extension points. */
 
-import { createModels } from '@earendil-works/pi-ai'
-import type { MutableModels, Provider } from '@earendil-works/pi-ai'
-import { openaiCodexProvider } from '@earendil-works/pi-ai/providers/openai-codex'
+import type { Provider } from '@earendil-works/pi-ai'
 import { resolveRetryPolicy } from '@deepseek-ai/dsh-llm'
 import { PiAiAdapter } from '@deepseek-ai/dsh-llm-pi-ai'
 import type { ResolvedPiAiProviderProfile } from '@deepseek-ai/dsh-llm-pi-ai'
 import type { AttachmentStore } from '@deepseek-ai/dsh-attachment'
-import type { OpenAICodexCredentialStore } from './store.ts'
+import type { OpenAICodexAuthRuntime } from './auth-runtime.ts'
 import { OPENAI_CODEX_PROVIDER } from './store.ts'
 
 /** Provider idle ceiling used by the composite route. */
@@ -44,23 +43,21 @@ function requestProvider(provider: Provider): Provider {
  * plugin supplies its provider-native OAuth token for each request.
  */
 export function createOpenAICodexAdapter(
-  credentials: OpenAICodexCredentialStore,
+  auth: OpenAICodexAuthRuntime,
   resolveAttachments: () => AttachmentStore | undefined,
 ): PiAiAdapter {
-  const provider = openaiCodexProvider()
+  const provider = auth.provider
   const profiles = new Map<string, ResolvedPiAiProviderProfile>([[OPENAI_CODEX_PROVIDER, {
     provider: OPENAI_CODEX_PROVIDER,
     displayName: 'OpenAI Codex',
     streamIdleTimeoutMs: OPENAI_CODEX_STREAM_IDLE_TIMEOUT_MS,
-    retryPolicy: resolveRetryPolicy(undefined, 'dsh-codex-connect retryPolicy'),
+    retryPolicy: resolveRetryPolicy(undefined, 'dsh-codex-connect-plus retryPolicy'),
     configuredMaxTokens: new Map(),
     piProvider: requestProvider(provider),
   }]])
-  const models: MutableModels = createModels({ credentials })
-  models.setProvider(provider)
   return new PiAiAdapter({
     profiles: () => profiles,
-    resolveApiKey: async () => (await models.getAuth(OPENAI_CODEX_PROVIDER))?.auth.apiKey,
+    resolveApiKey: () => auth.accessToken(),
     resolveAttachments,
   })
 }

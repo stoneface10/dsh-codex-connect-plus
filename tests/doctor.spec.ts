@@ -14,7 +14,7 @@ afterEach(async () => {
   root = undefined
 })
 
-describe('Codex Connect doctor', () => {
+describe('Codex Connect Plus doctor', () => {
   it('reports defaults and a missing credential without starting OAuth', async () => {
     root = await mkdtemp(join(tmpdir(), 'dsh-codex-connect-doctor-'))
     const report = await diagnoseOpenAICodex({ credentialPath: join(root, 'missing.json') })
@@ -23,6 +23,7 @@ describe('Codex Connect doctor', () => {
       modelProvider: true,
       search: false,
       imageTool: false,
+      imageGeneration: true,
       changesHarnessDefaultModel: false,
       changesHarnessSearchRoute: false,
     })

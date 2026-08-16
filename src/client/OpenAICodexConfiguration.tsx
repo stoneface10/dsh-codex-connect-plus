@@ -1,3 +1,4 @@
+/* Modified from dsh-codex-connect by 0751 for dsh-codex-connect-plus; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /** Staged optional-capability editor inside the OpenAI Codex plugin card. */
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
@@ -41,6 +42,7 @@ const UNAVAILABLE_SNAPSHOT = {
 const CONFIG_FIELDS = [
   'enableSearch',
   'enableImageTool',
+  'enableImageGeneration',
   'searchModel',
   'searchMode',
   'searchContextSize',
@@ -208,6 +210,17 @@ export function OpenAICodexConfiguration({ scope, t }: OpenAICodexConfigurationP
             <span style={toggleCopyStyle}>
               <span style={labelStyle}>{t('enableImageTool')}</span>
               <span style={bodyStyle}>{t('enableImageToolHelp')}</span>
+            </span>
+          </label>
+          <label style={toggleRowStyle}>
+            <input
+              type="checkbox"
+              checked={draft.enableImageGeneration}
+              onChange={event => { update('enableImageGeneration', event.currentTarget.checked) }}
+            />
+            <span style={toggleCopyStyle}>
+              <span style={labelStyle}>{t('enableImageGeneration')}</span>
+              <span style={bodyStyle}>{t('enableImageGenerationHelp')}</span>
             </span>
           </label>
         </fieldset>

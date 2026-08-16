@@ -1,11 +1,15 @@
 {
-  "name": "dsh-codex-connect",
-  "displayName": "Codex Connect",
-  "description": "ChatGPT OAuth and Codex models for DeepSeek Harness.",
-  "version": "0.1.0-alpha.4.5",
-  "author": "Frank Song",
+  "name": "dsh-codex-connect-plus",
+  "displayName": "Codex Connect Plus",
+  "description": "ChatGPT OAuth, Codex models, search, vision, and gpt-image-2 generation for DeepSeek Harness.",
+  "version": "0.1.0-alpha.1",
+  "author": "0751",
   "contributors": [
-    "Yan-Zero (original dsh-codex author)"
+    "Frank Song (dsh-codex-connect author)",
+    "Yan-Zero (original dsh-codex author)",
+    "JuneLearn (dsh-image2-draw portions)",
+    "ningzimu (codex-gpt-image portions)",
+    "MC5lan/dsh-multimodal contributors (attachment and tool-card portions)"
   ],
   "keywords": [
     "dsh-plugin",
@@ -13,7 +17,9 @@
     "openai-codex",
     "chatgpt-oauth",
     "oauth",
-    "codex"
+    "codex",
+    "gpt-image-2",
+    "image-generation"
   ],
   "publishConfig": {
     "access": "public",
@@ -22,11 +28,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/franksong2702/dsh-codex-connect.git"
+    "url": "git+https://github.com/stoneface10/dsh-codex-connect-plus.git"
   },
-  "homepage": "https://github.com/franksong2702/dsh-codex-connect#readme",
+  "homepage": "https://github.com/stoneface10/dsh-codex-connect-plus#readme",
   "bugs": {
-    "url": "https://github.com/franksong2702/dsh-codex-connect/issues"
+    "url": "https://github.com/stoneface10/dsh-codex-connect-plus/issues"
   },
   "type": "module",
   "engines": {
@@ -35,7 +41,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "bin": {
-    "dsh-codex-connect": "lib/bin.js"
+    "dsh-codex-connect-plus": "lib/bin.js"
   },
   "scripts": {
     "lint": "node scripts/lint.mjs",
@@ -65,7 +71,11 @@
     "docs",
     "INSTALL.md",
     "MIGRATION.md",
-    "NOTICE"
+    "RELEASING.md",
+    "SECURITY.md",
+    "CHANGELOG.md",
+    "NOTICE",
+    "THIRD_PARTY_NOTICES.md"
   ],
   "license": "Apache-2.0",
   "dsh": {
@@ -79,6 +89,9 @@
         "@deepseek-ai/dsh-client-runtime",
         "@deepseek-ai/dsh-client-ui-settings",
         "@deepseek-ai/dsh-client-ui-settings-plugins",
+        "@deepseek-ai/dsh-client-ui-tool",
+        "@deepseek-ai/dsh-client-ui-attachment",
+        "@deepseek-ai/dsh-client-ui-slots",
         "@deepseek-ai/dsh-client-locale"
       ],
       "platform": "web"
@@ -100,6 +113,9 @@
     "@deepseek-ai/dsh-settings": "*",
     "@deepseek-ai/dsh-tools": "*",
     "@deepseek-ai/dsh-web": "*",
+    "@deepseek-ai/dsh-client-ui-tool": "*",
+    "@deepseek-ai/dsh-client-ui-attachment": "*",
+    "@deepseek-ai/dsh-client-ui-slots": "*",
     "@deepseek-ai/schemastery": "^3.18.1-rc.1",
     "react": "^18.2.0"
   },
@@ -118,6 +134,8 @@
     "@deepseek-ai/dsh-client-runtime": "0.1.0-rc.6",
     "@deepseek-ai/dsh-client-ui-settings": "0.1.0-rc.6",
     "@deepseek-ai/dsh-client-ui-settings-plugins": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-client-ui-attachment": "0.1.0-rc.6",
+    "@deepseek-ai/dsh-client-ui-tool": "0.1.0-rc.6",
     "@deepseek-ai/dsh-client-ui-slots": "0.1.0-rc.6",
     "@deepseek-ai/dsh-fs": "0.1.0-rc.6",
     "@deepseek-ai/dsh-fs-local": "0.1.0-rc.6",

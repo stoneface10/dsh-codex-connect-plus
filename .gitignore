@@ -2,3 +2,6 @@ node_modules/
 *.tsbuildinfo
 .openai-codex-auth.json
 .playwright-cli/
+*.tgz
+outputs/
+.smoke-output/

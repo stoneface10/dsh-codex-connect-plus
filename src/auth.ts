@@ -1,6 +1,7 @@
+/* Modified from dsh-codex-connect by 0751 for dsh-codex-connect-plus; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /**
  * OpenAI Codex OAuth orchestration shared by the plugin and standalone launcher.
- * @module dsh-codex-connect/auth
+ * @module dsh-codex-connect-plus/auth
  */
 
 import { createModels } from '@earendil-works/pi-ai'

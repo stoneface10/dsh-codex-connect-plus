@@ -2,7 +2,8 @@
 # web-search route. Optional capabilities require explicit profile config.
 - insert:
     - id: llm-openai-codex
-      name: dsh-codex-connect
+      name: dsh-codex-connect-plus
       config:
         enableSearch: false
         enableImageTool: false
+        enableImageGeneration: true

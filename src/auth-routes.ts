@@ -1,3 +1,4 @@
+/* Modified from dsh-codex-connect by 0751 for dsh-codex-connect-plus; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /** Same-origin Web settings routes for OpenAI Codex OAuth. */
 
 import type { IncomingMessage, ServerResponse } from 'node:http'
@@ -291,5 +292,5 @@ export function registerOpenAICodexAuthRoutes(
       for (const dispose of routes) dispose()
       await auth.dispose()
     }
-  }, 'dsh-codex-connect: Web OAuth routes')
+  }, 'dsh-codex-connect-plus: Web OAuth routes')
 }

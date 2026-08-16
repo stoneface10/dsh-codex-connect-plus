@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import type { UserConfig } from 'tsdown'
 
-const PLUGIN_ID = 'dsh-codex-connect'
+const PLUGIN_ID = 'dsh-codex-connect-plus'
 const PACKAGE_VERSION = (JSON.parse(
   readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
 ) as { version: string }).version
@@ -15,6 +15,9 @@ const CLIENT_EXTERNALS = [
   '@deepseek-ai/dsh-client-connection/client',
   '@deepseek-ai/dsh-client-runtime/client',
   '@deepseek-ai/dsh-client-ui-settings/client',
+  '@deepseek-ai/dsh-client-ui-tool/client',
+  '@deepseek-ai/dsh-client-ui-attachment',
+  '@deepseek-ai/dsh-client-ui-slots',
 ] as const
 
 export default [
@@ -33,6 +36,9 @@ export default [
     clean: true,
     define: {
       __CODEX_CONNECT_VERSION__: JSON.stringify(PACKAGE_VERSION),
+    },
+    outputOptions: {
+      banner: '/* dsh-codex-connect-plus: modified derivative; Copyright 2026 0751; Apache-2.0, see NOTICE and THIRD_PARTY_NOTICES.md. */',
     },
     deps: {
       neverBundle: [
@@ -67,7 +73,7 @@ export default [
     },
     outputOptions: {
       entryFileNames: 'client.js',
-      banner: `window.__ModuleLoader__.load({ id: ${JSON.stringify(PLUGIN_ID)}, factory: (require) => {`,
+      banner: `/* dsh-codex-connect-plus: modified derivative; Copyright 2026 0751; Apache-2.0, see NOTICE and THIRD_PARTY_NOTICES.md. */\nwindow.__ModuleLoader__.load({ id: ${JSON.stringify(PLUGIN_ID)}, factory: (require) => {`,
       footer: 'return module.exports; } });',
       intro: 'var module = { exports: {} }; var exports = module.exports;',
     },

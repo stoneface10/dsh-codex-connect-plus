@@ -1,3 +1,4 @@
+/* Modified from dsh-codex-connect by 0751 for dsh-codex-connect-plus; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /** Node-free settings contract shared by the Host plugin and browser card. */
 
 /** Stable Harness settings namespace owned by this plugin. */
@@ -22,6 +23,7 @@ export const DEFAULT_OPENAI_CODEX_SEARCH_MAX_OUTPUT_TOKENS = 10_000
 export interface OpenAICodexSettingsConfig {
   enableSearch: boolean
   enableImageTool: boolean
+  enableImageGeneration: boolean
   searchModel: string
   searchMode: OpenAICodexSearchMode
   searchContextSize: OpenAICodexSearchContextSize
@@ -31,6 +33,7 @@ export interface OpenAICodexSettingsConfig {
 export const DEFAULT_OPENAI_CODEX_SETTINGS: Readonly<OpenAICodexSettingsConfig> = Object.freeze({
   enableSearch: false,
   enableImageTool: false,
+  enableImageGeneration: true,
   searchModel: DEFAULT_OPENAI_CODEX_SEARCH_MODEL,
   searchMode: DEFAULT_OPENAI_CODEX_SEARCH_MODE,
   searchContextSize: DEFAULT_OPENAI_CODEX_SEARCH_CONTEXT_SIZE,
@@ -53,11 +56,12 @@ export function decodeOpenAICodexSettings(value: unknown): OpenAICodexSettingsCo
   if (!isRecord(value)) return undefined
   const enableSearch = value['enableSearch']
   const enableImageTool = value['enableImageTool']
+  const enableImageGeneration = value['enableImageGeneration']
   const searchModel = value['searchModel']
   const searchMode = value['searchMode']
   const searchContextSize = value['searchContextSize']
   const searchMaxOutputTokens = value['searchMaxOutputTokens']
-  if (typeof enableSearch !== 'boolean' || typeof enableImageTool !== 'boolean') return undefined
+  if (typeof enableSearch !== 'boolean' || typeof enableImageTool !== 'boolean' || typeof enableImageGeneration !== 'boolean') return undefined
   if (typeof searchModel !== 'string' || searchModel.trim().length === 0) return undefined
   if (searchMode !== 'cached' && searchMode !== 'indexed' && searchMode !== 'live') return undefined
   if (searchContextSize !== 'low' && searchContextSize !== 'medium' && searchContextSize !== 'high') return undefined
@@ -65,6 +69,7 @@ export function decodeOpenAICodexSettings(value: unknown): OpenAICodexSettingsCo
   return {
     enableSearch,
     enableImageTool,
+    enableImageGeneration,
     searchModel,
     searchMode,
     searchContextSize,

@@ -1,3 +1,4 @@
+/* dsh-codex-connect-plus: modified derivative; Copyright 2026 0751; Apache-2.0, see NOTICE and THIRD_PARTY_NOTICES.md. */
 import { Context } from "@deepseek-ai/cordis";
 //#region src/invariant.d.ts
 /** Cordis companion plugin name. */

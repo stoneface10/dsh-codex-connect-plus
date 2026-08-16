@@ -1,3 +1,4 @@
+/* Modified from dsh-codex-connect by 0751 for dsh-codex-connect-plus; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /** Secret-free diagnostics and duplicate-provider guidance. */
 
 import { lstat } from 'node:fs/promises'
@@ -13,12 +14,14 @@ export interface OpenAICodexDiagnosticOptions {
   providerIds?: readonly string[]
   /** Whether the optional standalone search provider is enabled. */
   enableSearch?: boolean
-  /** Whether the optional image tool is enabled. */
+  /** Whether the optional image-viewing tool is enabled. */
   enableImageTool?: boolean
+  /** Whether the optional gpt-image-2 generation/editing tools are enabled. */
+  enableImageGeneration?: boolean
 }
 
 export interface OpenAICodexDiagnosticReport {
-  package: 'dsh-codex-connect'
+  package: 'dsh-codex-connect-plus'
   version: string
   node: string
   credentialFile: {
@@ -30,6 +33,7 @@ export interface OpenAICodexDiagnosticReport {
     modelProvider: true
     search: boolean
     imageTool: boolean
+    imageGeneration: boolean
     changesHarnessDefaultModel: false
     changesHarnessSearchRoute: false
   }
@@ -39,7 +43,7 @@ export interface OpenAICodexDiagnosticReport {
 
 /** Actionable message for legacy/manual `openai-codex` adapter collisions. */
 export function openAICodexConflictMessage(): string {
-  return 'Codex Connect cannot register provider "openai-codex" because another adapter already owns it. '
+  return 'Codex Connect Plus cannot register provider "openai-codex" because another adapter already owns it. '
     + 'Remove or disable the legacy dsh-codex bundle or manual openai-codex provider row, then restart Harness.'
 }
 
@@ -84,7 +88,7 @@ export async function diagnoseOpenAICodex(
   if (!providerConflict) hints.push('If Harness reports a duplicate openai-codex adapter, remove the legacy bundle or manual provider row.')
 
   return {
-    package: 'dsh-codex-connect',
+    package: 'dsh-codex-connect-plus',
     version: CODEX_CONNECT_VERSION,
     node: process.version,
     credentialFile: { path, state, ...mode === undefined ? {} : { mode } },
@@ -92,6 +96,7 @@ export async function diagnoseOpenAICodex(
       modelProvider: true,
       search: options.enableSearch === true,
       imageTool: options.enableImageTool === true,
+      imageGeneration: options.enableImageGeneration !== false,
       changesHarnessDefaultModel: false,
       changesHarnessSearchRoute: false,
     },

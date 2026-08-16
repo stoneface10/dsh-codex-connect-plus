@@ -1,3 +1,4 @@
+/* Modified from dsh-codex-connect by 0751 for dsh-codex-connect-plus; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /** Durable request event owned by the OpenAI Codex search provider. */
 
 import type { Context } from '@deepseek-ai/cordis'
@@ -24,7 +25,7 @@ declare module '@deepseek-ai/dsh-session/types' {
  */
 export function installOpenAICodexSearchEvent(): void {
   if (!(KNOWN_SESSION_EVENT_TYPES instanceof Set)) {
-    throw new Error('dsh-codex-connect: this Harness build does not expose an extensible session event vocabulary')
+    throw new Error('dsh-codex-connect-plus: this Harness build does not expose an extensible session event vocabulary')
   }
   KNOWN_SESSION_EVENT_TYPES.add(OPENAI_CODEX_SEARCH_MODEL_REQUEST_EVENT)
 }

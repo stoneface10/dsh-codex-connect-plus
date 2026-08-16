@@ -1,53 +1,9 @@
+/* dsh-codex-connect-plus: modified derivative; Copyright 2026 0751; Apache-2.0, see NOTICE and THIRD_PARTY_NOTICES.md. */
 import z from "@deepseek-ai/schemastery";
 import { AuthInteraction, Credential, CredentialInfo, CredentialStore } from "@earendil-works/pi-ai";
 import "@deepseek-ai/dsh-tools";
 import { WebSearchProvider, WebSearchRequest, WebSearchResult } from "@deepseek-ai/dsh-web";
 import { Context } from "@deepseek-ai/cordis";
-//#region src/view-image.d.ts
-/** Stable Codex tool name. */
-declare const VIEW_IMAGE_TOOL_NAME = "view_image";
-//#endregion
-//#region src/doctor.d.ts
-/** Inputs that are safe to obtain without booting OAuth. */
-interface OpenAICodexDiagnosticOptions {
-  /** Credential pathname to inspect through metadata only. */
-  credentialPath?: string;
-  /** Provider ids already registered in the active Harness context. */
-  providerIds?: readonly string[];
-  /** Whether the optional standalone search provider is enabled. */
-  enableSearch?: boolean;
-  /** Whether the optional image tool is enabled. */
-  enableImageTool?: boolean;
-}
-interface OpenAICodexDiagnosticReport {
-  package: 'dsh-codex-connect';
-  version: string;
-  node: string;
-  credentialFile: {
-    path: string;
-    state: 'missing' | 'owner-only' | 'permissions-too-broad' | 'not-a-regular-file' | 'unreadable-metadata';
-    mode?: string;
-  };
-  capabilities: {
-    modelProvider: true;
-    search: boolean;
-    imageTool: boolean;
-    changesHarnessDefaultModel: false;
-    changesHarnessSearchRoute: false;
-  };
-  providerConflict: boolean;
-  hints: string[];
-}
-/** Actionable message for legacy/manual `openai-codex` adapter collisions. */
-declare function openAICodexConflictMessage(): string;
-/** Fail before the generic registry error so the collision has a migration hint. */
-declare function assertNoOpenAICodexProviderConflict(providerIds: readonly string[]): void;
-/**
- * Inspect only process and filesystem metadata. This function never opens the
- * OAuth document, refreshes a token, or starts an authorization flow.
- */
-declare function diagnoseOpenAICodex(options?: OpenAICodexDiagnosticOptions): Promise<OpenAICodexDiagnosticReport>;
-//#endregion
 //#region src/store.d.ts
 /** Provider route and pi-ai provider id owned by this bundle. */
 declare const OPENAI_CODEX_PROVIDER = "openai-codex";
@@ -78,6 +34,115 @@ declare class OpenAICodexCredentialStore implements CredentialStore {
   /** @inheritdoc */
   delete(providerId: string): Promise<void>;
 }
+//#endregion
+//#region src/images/tools.d.ts
+declare const CODEX_IMAGE_GENERATE_TOOL_NAME = "codex_image_generate";
+declare const CODEX_IMAGE_EDIT_TOOL_NAME = "codex_image_edit";
+//#endregion
+//#region src/images/protocol.d.ts
+declare const CODEX_IMAGE_MODEL = "gpt-image-2";
+declare const CODEX_IMAGE_GENERATE_URL = "https://chatgpt.com/backend-api/codex/images/generations";
+declare const CODEX_IMAGE_EDIT_URL = "https://chatgpt.com/backend-api/codex/images/edits";
+type CodexImageQuality = 'low' | 'medium' | 'high' | 'auto';
+type CodexImageBackground = 'auto' | 'opaque';
+type CodexImageModeration = 'auto' | 'low';
+type CodexImageMediaType = 'image/png' | 'image/jpeg' | 'image/webp';
+interface CodexImageType {
+  extension: '.png' | '.jpg' | '.webp';
+  mediaType: CodexImageMediaType;
+}
+interface CodexImageRequest {
+  prompt: string;
+  model: typeof CODEX_IMAGE_MODEL;
+  n: number;
+  size: string;
+  quality: CodexImageQuality;
+  output_format: 'png';
+  background: CodexImageBackground;
+  moderation: CodexImageModeration;
+  images?: readonly {
+    image_url: string;
+  }[];
+  mask?: {
+    image_url: string;
+  };
+}
+interface DecodedCodexImage {
+  data: Uint8Array;
+  type: CodexImageType;
+  revisedPrompt?: string;
+}
+/** Resolve aliases and enforce conservative dimensions accepted by the backend. */
+declare function resolveCodexImageSize(value: string | undefined, prompt: string): string;
+/** Recognize only supported raster signatures after decoding. */
+declare function detectCodexImageType(data: Uint8Array): CodexImageType;
+/** Validate common tool input and produce the fixed JSON request fields. */
+declare function createCodexImageRequest(input: {
+  prompt: string;
+  size?: string;
+  quality?: string;
+  background?: string;
+  moderation?: string;
+  count?: number;
+  images?: readonly {
+    image_url: string;
+  }[];
+  mask?: {
+    image_url: string;
+  };
+}): CodexImageRequest;
+/** Redact provider-controlled details before displaying an HTTP failure. */
+declare function safeCodexImageHttpError(status: number, body: Uint8Array): Error;
+/** Parse and validate every image payload from a bounded JSON response. */
+declare function decodeCodexImageResponse(value: unknown): DecodedCodexImage[];
+//#endregion
+//#region src/view-image.d.ts
+/** Stable Codex tool name. */
+declare const VIEW_IMAGE_TOOL_NAME = "view_image";
+//#endregion
+//#region src/doctor.d.ts
+/** Inputs that are safe to obtain without booting OAuth. */
+interface OpenAICodexDiagnosticOptions {
+  /** Credential pathname to inspect through metadata only. */
+  credentialPath?: string;
+  /** Provider ids already registered in the active Harness context. */
+  providerIds?: readonly string[];
+  /** Whether the optional standalone search provider is enabled. */
+  enableSearch?: boolean;
+  /** Whether the optional image-viewing tool is enabled. */
+  enableImageTool?: boolean;
+  /** Whether the optional gpt-image-2 generation/editing tools are enabled. */
+  enableImageGeneration?: boolean;
+}
+interface OpenAICodexDiagnosticReport {
+  package: 'dsh-codex-connect-plus';
+  version: string;
+  node: string;
+  credentialFile: {
+    path: string;
+    state: 'missing' | 'owner-only' | 'permissions-too-broad' | 'not-a-regular-file' | 'unreadable-metadata';
+    mode?: string;
+  };
+  capabilities: {
+    modelProvider: true;
+    search: boolean;
+    imageTool: boolean;
+    imageGeneration: boolean;
+    changesHarnessDefaultModel: false;
+    changesHarnessSearchRoute: false;
+  };
+  providerConflict: boolean;
+  hints: string[];
+}
+/** Actionable message for legacy/manual `openai-codex` adapter collisions. */
+declare function openAICodexConflictMessage(): string;
+/** Fail before the generic registry error so the collision has a migration hint. */
+declare function assertNoOpenAICodexProviderConflict(providerIds: readonly string[]): void;
+/**
+ * Inspect only process and filesystem metadata. This function never opens the
+ * OAuth document, refreshes a token, or starts an authorization flow.
+ */
+declare function diagnoseOpenAICodex(options?: OpenAICodexDiagnosticOptions): Promise<OpenAICodexDiagnosticReport>;
 //#endregion
 //#region src/usage.d.ts
 /** Fixed endpoint used by the official Codex client for ChatGPT rate limits. */
@@ -159,6 +224,7 @@ declare const DEFAULT_OPENAI_CODEX_SEARCH_MAX_OUTPUT_TOKENS = 10000;
 interface OpenAICodexSettingsConfig {
   enableSearch: boolean;
   enableImageTool: boolean;
+  enableImageGeneration: boolean;
   searchModel: string;
   searchMode: OpenAICodexSearchMode;
   searchContextSize: OpenAICodexSearchContextSize;
@@ -311,6 +377,8 @@ interface Config {
   enableSearch?: boolean;
   /** Register the optional image-loading tool. */
   enableImageTool?: boolean;
+  /** Register gpt-image-2 generation and edit tools. */
+  enableImageGeneration?: boolean;
   /** Model used for auxiliary standalone searches. */
   searchModel?: string;
   /** Cached, indexed, or live web access. */
@@ -330,4 +398,4 @@ declare const Config: z<Config>;
  */
 declare function apply(ctx: Context, config: Config): void;
 //#endregion
-export { Config, DEFAULT_OPENAI_CODEX_SEARCH_CONTEXT_SIZE, DEFAULT_OPENAI_CODEX_SEARCH_MAX_OUTPUT_TOKENS, DEFAULT_OPENAI_CODEX_SEARCH_MODE, DEFAULT_OPENAI_CODEX_SEARCH_MODEL, DEFAULT_OPENAI_CODEX_SETTINGS, OPENAI_CODEX_AUTH_FILENAME, OPENAI_CODEX_BASE_URL, OPENAI_CODEX_PROVIDER, OPENAI_CODEX_SEARCH_MODEL_REQUEST_EVENT, OPENAI_CODEX_SEARCH_PROVIDER, OPENAI_CODEX_SEARCH_URL, OPENAI_CODEX_SETTINGS_NAMESPACE, OPENAI_CODEX_SETTINGS_NS, OPENAI_CODEX_USAGE_URL, type OpenAICodexAuthStatus, OpenAICodexCredentialStore, type OpenAICodexCredits, type OpenAICodexDiagnosticOptions, type OpenAICodexDiagnosticReport, type OpenAICodexIndividualLimit, type OpenAICodexRateLimit, type OpenAICodexRateLimitWindow, type OpenAICodexSearchContextSize, type OpenAICodexSearchMode, OpenAICodexSearchProvider, type OpenAICodexSearchProviderOptions, type OpenAICodexSearchRequestRecord, type OpenAICodexSettingsConfig, type OpenAICodexUsage, VIEW_IMAGE_TOOL_NAME, apply, assertNoOpenAICodexProviderConflict, decodeOpenAICodexSettings, diagnoseOpenAICodex, inject, installOpenAICodexSearchEvent, loginOpenAICodex, logoutOpenAICodex, mapOpenAICodexSearchResponse, name, openAICodexAuthPath, openAICodexAuthStatus, openAICodexConflictMessage, parseOpenAICodexUsage, readOpenAICodexRateLimits, recordOpenAICodexSearchRequest, resolveOpenAICodexSettings };
+export { CODEX_IMAGE_EDIT_TOOL_NAME, CODEX_IMAGE_EDIT_URL, CODEX_IMAGE_GENERATE_TOOL_NAME, CODEX_IMAGE_GENERATE_URL, CODEX_IMAGE_MODEL, Config, DEFAULT_OPENAI_CODEX_SEARCH_CONTEXT_SIZE, DEFAULT_OPENAI_CODEX_SEARCH_MAX_OUTPUT_TOKENS, DEFAULT_OPENAI_CODEX_SEARCH_MODE, DEFAULT_OPENAI_CODEX_SEARCH_MODEL, DEFAULT_OPENAI_CODEX_SETTINGS, OPENAI_CODEX_AUTH_FILENAME, OPENAI_CODEX_BASE_URL, OPENAI_CODEX_PROVIDER, OPENAI_CODEX_SEARCH_MODEL_REQUEST_EVENT, OPENAI_CODEX_SEARCH_PROVIDER, OPENAI_CODEX_SEARCH_URL, OPENAI_CODEX_SETTINGS_NAMESPACE, OPENAI_CODEX_SETTINGS_NS, OPENAI_CODEX_USAGE_URL, type OpenAICodexAuthStatus, OpenAICodexCredentialStore, type OpenAICodexCredits, type OpenAICodexDiagnosticOptions, type OpenAICodexDiagnosticReport, type OpenAICodexIndividualLimit, type OpenAICodexRateLimit, type OpenAICodexRateLimitWindow, type OpenAICodexSearchContextSize, type OpenAICodexSearchMode, OpenAICodexSearchProvider, type OpenAICodexSearchProviderOptions, type OpenAICodexSearchRequestRecord, type OpenAICodexSettingsConfig, type OpenAICodexUsage, VIEW_IMAGE_TOOL_NAME, apply, assertNoOpenAICodexProviderConflict, createCodexImageRequest, decodeCodexImageResponse, decodeOpenAICodexSettings, detectCodexImageType, diagnoseOpenAICodex, inject, installOpenAICodexSearchEvent, loginOpenAICodex, logoutOpenAICodex, mapOpenAICodexSearchResponse, name, openAICodexAuthPath, openAICodexAuthStatus, openAICodexConflictMessage, parseOpenAICodexUsage, readOpenAICodexRateLimits, recordOpenAICodexSearchRequest, resolveCodexImageSize, resolveOpenAICodexSettings, safeCodexImageHttpError };

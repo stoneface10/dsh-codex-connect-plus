@@ -1,12 +1,13 @@
+/* Modified from dsh-codex-connect by 0751 for dsh-codex-connect-plus; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /**
- * Package-owned invariant companion for `dsh-codex-connect`.
- * @module dsh-codex-connect/invariant
+ * Package-owned invariant companion for `dsh-codex-connect-plus`.
+ * @module dsh-codex-connect-plus/invariant
  */
 
 import type { Context } from '@deepseek-ai/cordis'
 import type { InvariantInstaller } from '@deepseek-ai/dsh-invariants'
 
-const PACKAGE_NAME = 'dsh-codex-connect'
+const PACKAGE_NAME = 'dsh-codex-connect-plus'
 
 /** Cordis companion plugin name. */
 export const name = 'openai-codex-invariant'

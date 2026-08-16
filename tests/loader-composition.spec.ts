@@ -30,7 +30,7 @@ describe('OpenAI Codex real composition', () => {
       '- id: web',
       "  name: 'test-web-service'",
       '- id: llm-openai-codex',
-      '  name: dsh-codex-connect',
+      '  name: dsh-codex-connect-plus',
       '',
     ].join('\n'))
 
@@ -42,7 +42,7 @@ describe('OpenAI Codex real composition', () => {
     const modules = new Map<string, unknown>([
       ['test-llm-service', LlmRuntime],
       ['test-web-service', WebRuntime],
-      ['dsh-codex-connect', OpenAICodex],
+      ['dsh-codex-connect-plus', OpenAICodex],
     ])
     ctx.loader.internal = {
       version: 'v2',
@@ -64,7 +64,7 @@ describe('OpenAI Codex real composition', () => {
     await expect(ctx.web.search({ query: 'must stay unconfigured' }))
       .rejects.toMatchObject({ code: 'WEB_PROVIDER_UNAVAILABLE' })
 
-    const entry = [...ctx.loader.entries()].find(candidate => candidate.options.name === 'dsh-codex-connect')
+    const entry = [...ctx.loader.entries()].find(candidate => candidate.options.name === 'dsh-codex-connect-plus')
     if (entry === undefined) throw new Error('OpenAI Codex Loader entry missing')
     if (entry.fiber === undefined) throw new Error('OpenAI Codex plugin fiber missing')
     await entry.fiber.dispose()

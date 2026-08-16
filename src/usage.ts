@@ -1,3 +1,4 @@
+/* Modified from dsh-codex-connect by 0751 for dsh-codex-connect-plus; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /** Live ChatGPT Codex rate-limit usage for the browser account page. */
 
 import { createModels } from '@earendil-works/pi-ai'
@@ -191,7 +192,7 @@ export async function readOpenAICodexRateLimits(
       'chatgpt-account-id': accountId,
       accept: 'application/json',
       'cache-control': 'no-store',
-      'user-agent': 'dsh-codex-connect',
+      'user-agent': 'dsh-codex-connect-plus',
     },
     signal: AbortSignal.timeout(USAGE_REQUEST_TIMEOUT_MS),
   })

@@ -1,6 +1,6 @@
 # Installation Runbook for CLI Agents
 
-Install `dsh-codex-connect` into one requested DeepSeek Harness profile without changing its current default model, search route, global configuration, or OAuth state.
+Install `dsh-codex-connect-plus` into one requested DeepSeek Harness profile without changing its current default model, search route, global configuration, or OAuth state.
 
 ## Safety requirements
 
@@ -16,17 +16,17 @@ Install `dsh-codex-connect` into one requested DeepSeek Harness profile without 
 2. Install the package:
 
    ```sh
-   dsh plugin --profile web add dsh-codex-connect@alpha
+   dsh plugin --profile web add dsh-codex-connect-plus@alpha
    ```
 
-   To pin this release exactly, use `dsh plugin --profile web add dsh-codex-connect@0.1.0-alpha.4.5`. If npm is unavailable, use `dsh plugin --profile web add 'github:franksong2702/dsh-codex-connect#v0.1.0-alpha.4.5'`.
+   To pin this release exactly, use `dsh plugin --profile web add dsh-codex-connect-plus@0.1.0-alpha.1`. If npm is unavailable, use `dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.1'`.
 
-3. Run `dsh --profile web --dump-config` and require exactly one `llm-openai-codex` row loading `dsh-codex-connect`.
+3. Run `dsh --profile web --dump-config` and require exactly one `llm-openai-codex` row loading `dsh-codex-connect-plus`.
 4. Confirm the effective `agent-default-model` and `web.searchProvider` values are unchanged from before installation.
 5. Run secret-free diagnostics:
 
    ```sh
-   dsh plugin --profile web exec dsh-codex-connect doctor
+   dsh plugin --profile web exec dsh-codex-connect-plus doctor
    ```
 
 6. If the user explicitly requests login, open **Settings → Plugins → Plugin configuration → Codex Connect**, or check `status` and then use `login` or `login --device-code`. OAuth approval belongs to the user.
@@ -63,13 +63,13 @@ Do not add the last two rows unless the user separately requested those routing 
 ## Update and removal
 
 ```sh
-dsh plugin --profile web update dsh-codex-connect@alpha
-dsh plugin --profile web remove dsh-codex-connect
+dsh plugin --profile web update dsh-codex-connect-plus@alpha
+dsh plugin --profile web remove dsh-codex-connect-plus
 ```
 
 Use an exact npm version when a reproducible update is required; use a GitHub tag only as the npm-unavailable fallback.
 
-Removal of the package and removal of its separate OAuth file are different actions. Run `dsh plugin --profile web exec dsh-codex-connect logout` only with explicit credential-deletion authorization.
+Removal of the package and removal of its separate OAuth file are different actions. Run `dsh plugin --profile web exec dsh-codex-connect-plus logout` only with explicit credential-deletion authorization.
 
 ## Completion report
 

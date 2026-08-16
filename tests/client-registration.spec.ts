@@ -12,6 +12,8 @@ describe('OpenAI Codex browser contribution', () => {
     expect(client).toContain('OPENAI_CODEX_SETTINGS_NAMESPACE')
     expect(client).not.toContain("ctx.slots.inject('settings.plugins.tab'")
     expect(client).not.toContain("ctx.slots.inject('settings.section'")
+    expect(client).toContain("ctx.slots.inject('tool.call.toolview'")
+    expect(client).toContain('createCodexImageLoader(sessions, sessionId)')
   })
 
   it('renders a Codex Connect card and uses OpenAI Codex for the Composer provider', async () => {
@@ -22,7 +24,7 @@ describe('OpenAI Codex browser contribution', () => {
     ])
     expect(clientCard).toContain('<li style={cardStyle}>')
     expect(clientCard).toContain('aria-expanded={open}')
-    expect(locales.match(/title: 'Codex Connect'/gu)).toHaveLength(2)
+    expect(locales.match(/title: 'Codex Connect Plus'/gu)).toHaveLength(2)
     expect(adapter).toContain("displayName: 'OpenAI Codex'")
   })
 })

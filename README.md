@@ -1,136 +1,122 @@
-# Codex Connect
-
-[![npm version](https://img.shields.io/npm/v/dsh-codex-connect?label=npm&color=cb3837)](https://www.npmjs.com/package/dsh-codex-connect)
+# Codex Connect Plus
 
 English | [中文](docs/README.zh.md)
 
-Connect your ChatGPT subscription to DeepSeek Harness with OAuth, user-controlled defaults, Harness-native approvals, diagnostics, and reliable session recovery.
+Connect a user-authorized ChatGPT subscription to DeepSeek Harness for Codex models, optional search and vision, and `gpt-image-2` generation/editing without an OpenAI Platform API key.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/franksong2702/dsh-codex-connect/main/docs/assets/hero.jpg" alt="Codex Connect — ChatGPT OAuth for DeepSeek Harness" width="100%">
-</p>
+> Community derivative. Not affiliated with or endorsed by OpenAI, DeepSeek, or the upstream Codex Connect maintainers.
 
-`dsh-codex-connect` adds the `openai-codex` model catalog and a separate ChatGPT OAuth login. Models run through Harness's normal LLM service, so streaming, tool calls, reasoning replay, compaction, filesystem controls, permission gates, and approval prompts remain Harness-owned. It does not turn a ChatGPT subscription into an OpenAI Platform API credential.
+## Features
 
-Installation is additive. The bundle does not replace the current default model or search route, and its standalone search provider and `view_image` tool are disabled until explicitly enabled.
-
-## See it in Harness
-
-Sign in and manage the plugin from **Settings → Plugins → Plugin configuration → Codex Connect**.
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/franksong2702/dsh-codex-connect/main/docs/assets/oauth-status.jpg" alt="Codex Connect ChatGPT OAuth status inside Harness plugin configuration" width="720">
-</p>
-
-Optional Codex search and `view_image` capabilities remain explicit, profile-scoped choices:
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/franksong2702/dsh-codex-connect/main/docs/assets/plugin-configuration.jpg" alt="Codex Connect optional capability settings in DeepSeek Harness" width="720">
-</p>
-
-Codex models then appear in Harness's normal model picker alongside the existing providers:
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/franksong2702/dsh-codex-connect/main/docs/assets/model-selector.jpg" alt="OpenAI Codex models in the DeepSeek Harness model picker" width="320">
-</p>
+- ChatGPT/Codex OAuth login and provider-native automatic refresh.
+- OpenAI Codex model catalog through Harness's normal LLM service.
+- Optional standalone Codex search provider.
+- Optional `view_image` tool for vision-capable models.
+- `codex_image_generate` for 1-4 `gpt-image-2` outputs.
+- `codex_image_edit` for 1-8 local PNG/JPEG/WebP references and an optional mask.
+- Durable DSH attachments, session-authorized replay, inline preview, and local files under `outputs/codex-image`.
+- Fixed upstream origins, no redirects, bounded inputs/responses, cancellation, timeout, strict image signatures, and redacted provider errors.
 
 ## Install
 
-```sh
-dsh plugin --profile web add dsh-codex-connect@alpha
-dsh web
-```
-
-To pin this release exactly, use `dsh plugin --profile web add dsh-codex-connect@0.1.0-alpha.4.5`. If npm is unavailable, use the GitHub tag fallback: `dsh plugin --profile web add 'github:franksong2702/dsh-codex-connect#v0.1.0-alpha.4.5'`. From a DeepSeek Harness source checkout, prefix commands with `pnpm`. For a local checkout, install `link:/absolute/path/to/dsh-codex-connect`.
-
-Sign in from **Settings → Plugins → Plugin configuration → Codex Connect → Sign in with ChatGPT**, or use the CLI:
+From npm after a release:
 
 ```sh
-dsh plugin --profile web exec dsh-codex-connect login
-dsh plugin --profile web exec dsh-codex-connect status
-dsh plugin --profile web exec dsh-codex-connect doctor
+dsh plugin --profile web add dsh-codex-connect-plus@alpha
 ```
 
-The doctor command reads process and filesystem metadata only. It never opens the OAuth document or prints a token, authorization URL, authorization code, account id, or auth-file content.
+From a GitHub tag containing committed `lib/` artifacts:
 
-## Explicit configuration
+```sh
+dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.1'
+```
 
-Open **Settings → Plugins → Plugin configuration → Codex Connect** to manage the ChatGPT account and optional capabilities in one card. Changes use Harness's revision-fenced settings store and apply live. **Save changes** affects only this plugin's capability section; it never selects a default model or global search route.
+From a downloaded GitHub Release package:
 
-The installed bundle row remains the composition base and is intentionally inert beyond model-provider registration:
+```sh
+dsh plugin --profile web add /path/to/dsh-codex-connect-plus-0.1.0-alpha.1.tgz
+```
+
+For local development:
+
+```sh
+dsh plugin --profile web add link:/absolute/path/to/dsh-codex-connect-plus
+```
+
+Do not install `dsh-codex-connect`, `dsh-codex-image-connect`, and this combined package in the same profile: they own the same provider and tool names.
+
+## Configure
+
+Open **Settings → Plugins → Plugin configuration → Codex Connect Plus**.
+
+1. Sign in with ChatGPT.
+2. Keep or change optional capability toggles.
+3. Save profile settings.
+
+Default capability settings:
 
 ```yaml
-- id: llm-openai-codex
-  config:
-    enableSearch: false
-    enableImageTool: false
+enableSearch: false
+enableImageTool: false
+enableImageGeneration: true
 ```
 
-To make a Codex model the default for new agents, add or update the separate Harness row yourself:
+The package does not take over the profile's default model or global search route.
 
-```yaml
-- id: agent-default-model
-  config:
-    provider: openai-codex
-    model: gpt-5.6-sol
+## Image tools
+
+Example requests:
+
+```text
+Use codex_image_generate to create a high-quality portrait travel poster.
 ```
 
-The card can enable Codex standalone search. Selecting it as the profile's global search provider remains a separate explicit choice:
-
-```yaml
-- id: llm-openai-codex
-  config:
-    enableSearch: true
-    searchMode: live
-    searchContextSize: medium
-
-- id: web
-  config:
-    searchProvider: openai-codex
+```text
+Use codex_image_edit with refs ["photo.png"] to replace the background.
 ```
 
-To add the image-loading tool, set `enableImageTool: true` on `llm-openai-codex`. Browser paste/drop remains a Harness attachment feature and does not depend on this tool.
+Generated files resolve from the current DSH session cwd and are stored under:
 
-| Field | Default | Values |
-|---|---:|---|
-| `enableSearch` | `false` | boolean |
-| `enableImageTool` | `false` | boolean |
-| `searchModel` | `gpt-5.6-sol` | Codex model id |
-| `searchMode` | `cached` | `cached`, `indexed`, `live` |
-| `searchContextSize` | `medium` | `low`, `medium`, `high` |
-| `searchMaxOutputTokens` | `10000` | positive integer |
+```text
+outputs/codex-image/
+```
 
-## Credentials, diagnostics, and conflicts
+Reference images are limited to 4 MB each and 8 images per edit request. Generation can take several minutes. A timeout or transport failure is not retried automatically because the upstream may already have processed the request.
 
-- OAuth is stored separately at `$DSH_HOME/.openai-codex-auth.json` (`~/.dsh` by default); `~/.codex/auth.json` is never copied or modified.
-- The parent directory and file are created with owner-only permissions where supported. Writes are atomic, and refresh writes use a cross-process file lock.
-- Status and diagnostics return only non-sensitive state. OAuth flow output is confined to an explicit `login` operation.
-- Browser OAuth routes accept only loopback clients and loopback Host/Origin values; sign-in fails closed when no valid HTTPS authorization URL arrives within 30 seconds.
-- A second adapter cannot own `openai-codex`. Startup fails with a focused hint when the legacy `dsh-codex` bundle or a manual provider row conflicts.
-- Removing the package does not delete OAuth state. Run `logout` only when credential removal is intended.
+## Security and API status
 
-## Compatibility and security boundary
+- OAuth credentials remain in the existing owner-only DSH credential store.
+- Refresh is performed by the pi-ai Codex provider under the store's lock; the image module never implements a token refresh endpoint.
+- Image requests use fixed HTTPS Codex application endpoints and `redirect: error`.
+- Tokens, JWTs, base64 image data, and authorization headers are redacted from surfaced provider errors.
+- Generated attachment reads are scoped through the owning DSH session.
 
-- Alpha compatibility targets the current Harness `0.1.0-rc.5` main-line composition and compatible `0.1.0-rc.6` plugin APIs, Node.js `^22.19.0 || >=24.0.0`, and the pinned `@earendil-works/pi-ai` Codex provider.
-- ChatGPT plan eligibility, model access, quotas, and backend behavior are controlled by OpenAI and may change.
-- The Codex endpoint does not enforce the ordinary Responses `max_output_tokens` field. Harness compaction still works, but that summary cap cannot be imposed server-side on this route.
-- Shell, filesystem, skills, MCP, subagents, approvals, permissions, attachments, session persistence, compaction, and recovery continue to come from the active Harness profile.
-- Remote `view_image` URLs are limited to public HTTP(S) destinations. Every DNS result and redirect is checked, and the connection is pinned to the validated address so localhost, private networks, link-local services, and cloud metadata endpoints remain unreachable.
-- No real OAuth operation is required for installation, build, tests, doctor, or package validation.
-
-See [INSTALL.md](INSTALL.md) for the idempotent agent runbook, [RELEASING.md](RELEASING.md) for the Alpha release checklist, [MIGRATION.md](MIGRATION.md) for migration from `dsh-codex`, and [docs/design.md](docs/design.md) for architecture details.
+The Codex Images application backend is not presented as a public or supported OpenAI Platform API. It may change, and availability depends on the user's account, subscription, region, limits, and upstream behavior.
 
 ## Development
 
 ```sh
-pnpm install --frozen-lockfile
+pnpm install
 pnpm run check
+npm pack --dry-run
 ```
 
-## Legal / Acknowledgements
+The repository intentionally commits both `src/` and generated `lib/`, matching the upstream distribution model. The npm/Release `.tgz` includes runtime files and documentation, but excludes source, tests, scripts, credentials, logs, and local outputs.
 
-Copyright 2026 Frank Song for the modifications and additional work in Codex Connect. This project includes software derived from [Yan-Zero/dsh-codex](https://github.com/Yan-Zero/dsh-codex); Copyright 2026 Yan-Zero is retained for the upstream material. Both are distributed under Apache-2.0, with details in [NOTICE](NOTICE). This project is not affiliated with or endorsed by OpenAI, ChatGPT, Codex, DeepSeek, or DeepSeek Harness.
+See [RELEASING.md](RELEASING.md) for the Alpha checklist.
+
+## Legal / provenance
+
+`dsh-codex-connect-plus` is a derivative of [dsh-codex-connect](https://github.com/franksong2702/dsh-codex-connect), which in turn includes software derived from [Yan-Zero/dsh-codex](https://github.com/Yan-Zero/dsh-codex).
+
+Image-generation and in-conversation image UI portions include adaptations from [dsh-image2-draw](https://github.com/JuneLearn/dsh-image2-draw) and [codex-gpt-image](https://github.com/ningzimu/codex-gpt-image). Applicable transitive attribution for [dsh-multimodal](https://github.com/MC5lan/dsh-multimodal) is also retained.
+
+See [NOTICE](NOTICE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+OpenAI, ChatGPT, Codex, DeepSeek, and DeepSeek Harness are names or trademarks of their respective owners. This independent project is not affiliated with, endorsed by, or sponsored by those owners.
+
+This project uses an existing user-authorized ChatGPT/Codex OAuth session. It does not claim that the Codex Images backend is a public, official, or supported API.
 
 ## License
 
-Apache-2.0
+Apache-2.0. See [LICENSE](LICENSE). Adapted third-party portions remain subject to [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

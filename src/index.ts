@@ -1,7 +1,8 @@
+/* Modified from dsh-codex-connect by 0751 for dsh-codex-connect-plus; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /**
  * ChatGPT OAuth and Codex models for DeepSeek Harness, with opt-in search and
  * image tooling.
- * @module dsh-codex-connect
+ * @module dsh-codex-connect-plus
  */
 
 import type { Context, Fiber } from '@deepseek-ai/cordis'
@@ -16,9 +17,22 @@ import type {} from '@deepseek-ai/dsh-host-webserver'
 import type {} from '@deepseek-ai/dsh-tools'
 import type {} from '@deepseek-ai/dsh-fs'
 import { createOpenAICodexAdapter } from './adapter.ts'
+import { OpenAICodexAuthRuntime } from './auth-runtime.ts'
 import { registerOpenAICodexAuthRoutes } from './auth-routes.ts'
 import { assertNoOpenAICodexProviderConflict } from './doctor.ts'
 import { viewImageTool } from './view-image.ts'
+import { registerCodexImageTools } from './images/tools.ts'
+export { CODEX_IMAGE_EDIT_TOOL_NAME, CODEX_IMAGE_GENERATE_TOOL_NAME } from './images/tools.ts'
+export {
+  CODEX_IMAGE_EDIT_URL,
+  CODEX_IMAGE_GENERATE_URL,
+  CODEX_IMAGE_MODEL,
+  createCodexImageRequest,
+  decodeCodexImageResponse,
+  detectCodexImageType,
+  resolveCodexImageSize,
+  safeCodexImageHttpError,
+} from './images/protocol.ts'
 import {
   installOpenAICodexSearchEvent,
   recordOpenAICodexSearchRequest,
@@ -110,6 +124,8 @@ export interface Config {
   enableSearch?: boolean
   /** Register the optional image-loading tool. */
   enableImageTool?: boolean
+  /** Register gpt-image-2 generation and edit tools. */
+  enableImageGeneration?: boolean
   /** Model used for auxiliary standalone searches. */
   searchModel?: string
   /** Cached, indexed, or live web access. */
@@ -123,6 +139,7 @@ export interface Config {
 export const Config: z<Config> = z.object({
   enableSearch: z.boolean().default(false),
   enableImageTool: z.boolean().default(false),
+  enableImageGeneration: z.boolean().default(true),
   searchModel: z.string().default(DEFAULT_OPENAI_CODEX_SEARCH_MODEL),
   searchMode: z.union(['cached', 'indexed', 'live'] as const).default(DEFAULT_OPENAI_CODEX_SEARCH_MODE),
   searchContextSize: z.union(['low', 'medium', 'high'] as const).default(DEFAULT_OPENAI_CODEX_SEARCH_CONTEXT_SIZE),
@@ -139,10 +156,11 @@ export const Config: z<Config> = z.object({
 export function apply(ctx: Context, config: Config): void {
   let current = () => config
   const credentials = new OpenAICodexCredentialStore()
+  const auth = new OpenAICodexAuthRuntime(credentials)
   assertNoOpenAICodexProviderConflict(ctx.llm.listProviders().map(provider => provider.id))
   ctx.llm.registerAdapter(
     [OPENAI_CODEX_PROVIDER],
-    createOpenAICodexAdapter(credentials, () => ctx.get('attachments')),
+    createOpenAICodexAdapter(auth, () => ctx.get('attachments')),
   )
   ctx.llm.registerConfigurableProviders([{
     provider: OPENAI_CODEX_PROVIDER,
@@ -157,8 +175,10 @@ export function apply(ctx: Context, config: Config): void {
   let searchFiber: Fiber | undefined
   let searchRegistration: object | undefined
   let searchTail = Promise.resolve()
-  let imageFiber: Fiber | undefined
-  let imageTail = Promise.resolve()
+  let viewImageFiber: Fiber | undefined
+  let viewImageTail = Promise.resolve()
+  let imageGenerationFiber: Fiber | undefined
+  let imageGenerationTail = Promise.resolve()
 
   const reconcileSearch = async (): Promise<void> => {
     if (stopped) return
@@ -194,7 +214,7 @@ export function apply(ctx: Context, config: Config): void {
         searchFiber = undefined
         searchRegistration = undefined
       }
-      ctx.logger.error('dsh-codex-connect: optional search provider failed to activate')
+      ctx.logger.error('dsh-codex-connect-plus: optional search provider failed to activate')
       ctx.logger.error(error)
     })
   }
@@ -202,46 +222,73 @@ export function apply(ctx: Context, config: Config): void {
   const reconcileImageTool = async (): Promise<void> => {
     if (stopped) return
     const enabled = resolveOpenAICodexSettings(current()).enableImageTool
-    if (enabled === (imageFiber !== undefined)) return
-    const previous = imageFiber
-    imageFiber = undefined
+    if (enabled === (viewImageFiber !== undefined)) return
+    const previous = viewImageFiber
+    viewImageFiber = undefined
     if (previous !== undefined) await previous.dispose()
     if (stopped || !enabled) return
     const fiber = ctx.inject(
       ['tools', 'fs', 'attachments'],
       toolCtx => toolCtx.tools.register(viewImageTool(toolCtx)),
     )
-    imageFiber = fiber
+    viewImageFiber = fiber
     void Promise.resolve(fiber).catch((error: unknown) => {
-      if (imageFiber === fiber) imageFiber = undefined
-      ctx.logger.error('dsh-codex-connect: optional view_image tool failed to activate')
+      if (viewImageFiber === fiber) viewImageFiber = undefined
+      ctx.logger.error('dsh-codex-connect-plus: optional view_image tool failed to activate')
+      ctx.logger.error(error)
+    })
+  }
+
+  const reconcileImageGeneration = async (): Promise<void> => {
+    if (stopped) return
+    const enabled = resolveOpenAICodexSettings(current()).enableImageGeneration
+    if (enabled === (imageGenerationFiber !== undefined)) return
+    const previous = imageGenerationFiber
+    imageGenerationFiber = undefined
+    if (previous !== undefined) await previous.dispose()
+    if (stopped || !enabled) return
+    const fiber = ctx.inject(
+      ['tools', 'fs', 'attachments'],
+      toolCtx => { registerCodexImageTools(toolCtx, auth) },
+    )
+    imageGenerationFiber = fiber
+    void Promise.resolve(fiber).catch((error: unknown) => {
+      if (imageGenerationFiber === fiber) imageGenerationFiber = undefined
+      ctx.logger.error('dsh-codex-connect-plus: optional gpt-image-2 tools failed to activate')
       ctx.logger.error(error)
     })
   }
 
   const scheduleCapabilities = (): void => {
     searchTail = searchTail.then(reconcileSearch, reconcileSearch).catch((error: unknown) => {
-      ctx.logger.error('dsh-codex-connect: could not apply the updated search configuration')
+      ctx.logger.error('dsh-codex-connect-plus: could not apply the updated search configuration')
       ctx.logger.error(error)
     })
-    imageTail = imageTail.then(reconcileImageTool, reconcileImageTool).catch((error: unknown) => {
-      ctx.logger.error('dsh-codex-connect: could not apply the updated image-tool configuration')
+    viewImageTail = viewImageTail.then(reconcileImageTool, reconcileImageTool).catch((error: unknown) => {
+      ctx.logger.error('dsh-codex-connect-plus: could not apply the updated view_image configuration')
+      ctx.logger.error(error)
+    })
+    imageGenerationTail = imageGenerationTail.then(reconcileImageGeneration, reconcileImageGeneration).catch((error: unknown) => {
+      ctx.logger.error('dsh-codex-connect-plus: could not apply the updated gpt-image-2 configuration')
       ctx.logger.error(error)
     })
   }
 
   ctx.effect(() => async () => {
     stopped = true
-    await Promise.all([searchTail, imageTail])
+    await Promise.all([searchTail, viewImageTail, imageGenerationTail])
     const search = searchFiber
-    const image = imageFiber
+    const viewImage = viewImageFiber
+    const imageGeneration = imageGenerationFiber
     searchFiber = undefined
-    imageFiber = undefined
+    viewImageFiber = undefined
+    imageGenerationFiber = undefined
     await Promise.allSettled([
       search?.dispose() ?? Promise.resolve(),
-      image?.dispose() ?? Promise.resolve(),
+      viewImage?.dispose() ?? Promise.resolve(),
+      imageGeneration?.dispose() ?? Promise.resolve(),
     ])
-  }, 'dsh-codex-connect: optional capability lifecycle')
+  }, 'dsh-codex-connect-plus: optional capability lifecycle')
 
   installSettingsSection(ctx, OPENAI_CODEX_SETTINGS_NS, Config, config, {
     setSource(source) { current = source },

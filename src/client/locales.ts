@@ -1,6 +1,7 @@
+/* Modified from dsh-codex-connect by 0751 for dsh-codex-connect-plus; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /** English copy for the OpenAI Codex Plugin configuration card. */
 export const en = {
-  title: 'Codex Connect',
+  title: 'Codex Connect Plus',
   intro: 'Use your ChatGPT subscription in dsh without an API key.',
   accountHeading: 'ChatGPT account',
   expand: 'Expand settings',
@@ -44,6 +45,8 @@ export const en = {
   searchMaxOutputTokens: 'Maximum search output tokens',
   enableImageTool: 'Enable view_image tool',
   enableImageToolHelp: 'Allows approved local reads and public-network image fetches for vision-capable models.',
+  enableImageGeneration: 'Enable gpt-image-2 generation and editing',
+  enableImageGenerationHelp: 'Registers codex_image_generate and codex_image_edit using this account. Images are saved locally and attached to the conversation.',
   routingNote: 'These settings never change the default model or the profile’s global search route.',
   settingsLoading: 'Loading plugin settings…',
   settingsUnavailable: 'Plugin settings are unavailable in this dsh profile.',
@@ -62,7 +65,7 @@ export type OpenAICodexSettingsKey = keyof typeof en
 
 /** Chinese copy for the OpenAI Codex Plugin configuration card. */
 export const zh: { [Key in OpenAICodexSettingsKey]: string } = {
-  title: 'Codex Connect',
+  title: 'Codex Connect Plus',
   intro: '使用 ChatGPT 订阅在 dsh 中调用模型，无需 API Key。',
   accountHeading: 'ChatGPT 账户',
   expand: '展开设置',
@@ -106,6 +109,8 @@ export const zh: { [Key in OpenAICodexSettingsKey]: string } = {
   searchMaxOutputTokens: '搜索最大输出 Tokens',
   enableImageTool: '启用 view_image 工具',
   enableImageToolHelp: '允许具备视觉能力的模型在审批后读取本地图片或获取公网图片。',
+  enableImageGeneration: '启用 gpt-image-2 文生图与编辑',
+  enableImageGenerationHelp: '使用当前账户注册 codex_image_generate 和 codex_image_edit；图片会保存到本地并附加到会话。',
   routingNote: '这些设置绝不会改动默认模型，也不会接管此 profile 的全局搜索路由。',
   settingsLoading: '正在加载插件设置…',
   settingsUnavailable: '此 dsh profile 无法使用插件设置。',
