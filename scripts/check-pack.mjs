@@ -25,8 +25,12 @@ function packedPaths(tgz) {
 
 const destination = await mkdtemp(join(tmpdir(), 'dsh-codex-connect-plus-pack-'))
 try {
-  const npmCli = join(dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js')
-  const result = spawnSync(process.execPath, [npmCli, 'pack', '--ignore-scripts', '--pack-destination', destination], {
+  const packArgs = ['pack', '--ignore-scripts', '--pack-destination', destination]
+  const command = process.platform === 'win32' ? process.execPath : 'npm'
+  const args = process.platform === 'win32'
+    ? [join(dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js'), ...packArgs]
+    : packArgs
+  const result = spawnSync(command, args, {
     cwd: new URL('..', import.meta.url),
     stdio: 'inherit',
   })
