@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## 0.1.0-beta.2 - 2026-08-17
+
+### Changed
+
+- Replaced keyword-heavy About and configuration-card copy with direct language explaining that users can use their ChatGPT subscription for Codex models and use `gpt-image-2` to generate or edit images in DeepSeek Harness without an OpenAI Platform API key.
+
 ## 0.1.0-beta.1 - 2026-08-17
 
 ### Changed

@@ -2,7 +2,7 @@
 /** English copy for the OpenAI Codex Plugin configuration card. */
 export const en = {
   title: 'Codex Connect Plus',
-  intro: 'Use ChatGPT/Codex subscription access for Codex models and gpt-image-2 generation/editing—no OpenAI Platform API key.',
+  intro: 'Use your ChatGPT subscription in DeepSeek Harness to access Codex models and generate or edit images with gpt-image-2—no OpenAI Platform API key required.',
   accountHeading: 'ChatGPT account',
   expand: 'Expand settings',
   collapse: 'Collapse settings',
@@ -72,7 +72,7 @@ export type OpenAICodexSettingsKey = keyof typeof en
 /** Chinese copy for the OpenAI Codex Plugin configuration card. */
 export const zh: { [Key in OpenAICodexSettingsKey]: string } = {
   title: 'Codex Connect Plus',
-  intro: '使用 ChatGPT/Codex 订阅额度调用 Codex 模型和 gpt-image-2 文生图/编辑，无需 OpenAI Platform API Key。',
+  intro: '在 DeepSeek Harness 中使用您的 ChatGPT 订阅额度调用 Codex 模型，并使用 gpt-image-2 生成和编辑图片，无需 OpenAI Platform API Key。',
   accountHeading: 'ChatGPT 账户',
   expand: '展开设置',
   collapse: '折叠设置',
