@@ -4,8 +4,10 @@ const packageJson = JSON.parse(await readFile(new URL('../package.json', import.
 const failures = []
 
 if (packageJson.name !== 'dsh-codex-connect-plus') failures.push('package name must be dsh-codex-connect-plus')
-if (!/^0\.1\.0-alpha\.[1-9]\d*(?:\.\d+)?$/u.test(packageJson.version)) failures.push('package version must be a 0.1.0 alpha release')
-if (packageJson.publishConfig?.tag !== 'alpha') failures.push('publishConfig.tag must be alpha')
+const releaseMatch = /^0\.1\.0-(alpha|beta)\.[1-9]\d*(?:\.\d+)?$/u.exec(packageJson.version)
+if (!releaseMatch) failures.push('package version must be a 0.1.0 alpha or beta release')
+const releaseChannel = releaseMatch?.[1]
+if (releaseChannel && packageJson.publishConfig?.tag !== releaseChannel) failures.push(`publishConfig.tag must be ${releaseChannel}`)
 if (packageJson.displayName !== 'Codex Connect Plus') failures.push('displayName mismatch')
 if (packageJson.author !== '0751') failures.push('package author must identify the derivative owner')
 for (const contributor of [
@@ -54,10 +56,12 @@ if (!readme.includes('English | [中文](docs/README.zh.md)')) failures.push('RE
 if (!readme.includes('<img src="docs/assets/hero.jpg"')) failures.push('README must display the product hero')
 if (!readme.includes('<img src="docs/assets/demo-codex-image-and-models.png"')) failures.push('README must display the real Codex and image-generation demo')
 if (!readme.includes(`github:stoneface10/dsh-codex-connect-plus#v${packageJson.version}`)) failures.push('README must pin the current GitHub release tag')
-if (!readme.includes('not yet published to npm')) failures.push('README must not advertise an unpublished npm package')
+if (releaseChannel && !readme.includes(`dsh-codex-connect-plus@${releaseChannel}`)) failures.push('README must advertise the matching npm prerelease channel')
+if (readme.includes('not yet published to npm')) failures.push('README must not claim the package is unpublished')
 const chinese = await readFile(new URL('../docs/README.zh.md', import.meta.url), 'utf8')
 if (!chinese.includes(`github:stoneface10/dsh-codex-connect-plus#v${packageJson.version}`)) failures.push('Chinese README must pin the current GitHub release tag')
-if (!chinese.includes('尚未发布到 npm')) failures.push('Chinese README must not advertise an unpublished npm package')
+if (releaseChannel && !chinese.includes(`dsh-codex-connect-plus@${releaseChannel}`)) failures.push('Chinese README must advertise the matching npm prerelease channel')
+if (chinese.includes('尚未发布到 npm')) failures.push('Chinese README must not claim the package is unpublished')
 try {
   await stat(new URL('../README.zh.md', import.meta.url))
   failures.push('root README.zh.md must live under docs/README.zh.md')

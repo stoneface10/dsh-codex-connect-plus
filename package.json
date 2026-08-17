@@ -2,7 +2,7 @@
   "name": "dsh-codex-connect-plus",
   "displayName": "Codex Connect Plus",
   "description": "Use ChatGPT/Codex subscription access in DeepSeek Harness for Codex models and gpt-image-2 generation/editing—no OpenAI Platform API key.",
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-beta.1",
   "author": "0751",
   "contributors": [
     "Frank Song (dsh-codex-connect author)",
@@ -24,7 +24,7 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/",
-    "tag": "alpha"
+    "tag": "beta"
   },
   "repository": {
     "type": "git",

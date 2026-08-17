@@ -40,17 +40,19 @@ Sign in once with ChatGPT OAuth. Codex model requests use the signed-in account'
 
 ## Install
 
-The package is not yet published to npm. Install the immutable GitHub tag containing committed `lib/` artifacts:
+Install the public npm beta:
 
 ```sh
-dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.3'
+dsh plugin --profile web add dsh-codex-connect-plus@beta
 ```
 
-From a downloaded GitHub Release package:
+Immutable GitHub fallback:
 
 ```sh
-dsh plugin --profile web add /path/to/dsh-codex-connect-plus-0.1.0-alpha.3.tgz
+dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-beta.1'
 ```
+
+A matching `.tgz` is also attached to the GitHub prerelease.
 
 For local development:
 

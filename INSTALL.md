@@ -13,13 +13,13 @@ Install `dsh-codex-connect-plus` into one requested DeepSeek Harness profile wit
 ## Install and validate
 
 1. Check `dsh --version` or `dsh --help`. From a Harness checkout use `pnpm dsh`.
-2. Install the immutable GitHub tag (the package is not yet published to npm):
+2. Install the public npm beta:
 
    ```sh
-   dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.3'
+   dsh plugin --profile web add dsh-codex-connect-plus@beta
    ```
 
-   Alternatively, download the `.tgz` attached to the matching GitHub prerelease and install that local path. Verify its published SHA-256 before installation.
+   For a reproducible fallback, use the immutable `v0.1.0-beta.1` GitHub tag or download the matching prerelease `.tgz` and verify its published SHA-256 before installation.
 
 3. Run `dsh --profile web --dump-config` and require exactly one `llm-openai-codex` row loading `dsh-codex-connect-plus`.
 4. Confirm the effective `agent-default-model` and `web.searchProvider` values are unchanged from before installation.
@@ -63,7 +63,7 @@ Do not add the last two rows unless the user separately requested those routing 
 ## Update and removal
 
 ```sh
-dsh plugin --profile web update dsh-codex-connect-plus@alpha
+dsh plugin --profile web update dsh-codex-connect-plus@beta
 dsh plugin --profile web remove dsh-codex-connect-plus
 ```
 

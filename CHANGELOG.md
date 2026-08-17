@@ -4,6 +4,18 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## 0.1.0-beta.1 - 2026-08-17
+
+### Changed
+
+- Published the first npm beta with `beta` and pre-stable `latest` distribution tags.
+- Reworked the English, Chinese, and in-app descriptions to foreground ChatGPT/Codex subscription access, Codex models, `gpt-image-2`, and the lack of an OpenAI Platform API key requirement.
+
+### Documentation
+
+- Added an original `gpt-image-2` project banner and a real DSH model-selector/image-output screenshot.
+- Made npm the primary installation route while retaining immutable GitHub tag and release-package fallbacks.
+
 ## 0.1.0-alpha.3 - 2026-08-16
 
 ### Changed

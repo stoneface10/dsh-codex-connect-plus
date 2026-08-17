@@ -40,17 +40,19 @@
 
 ## 安装
 
-本包尚未发布到 npm。请从包含 `lib/` 构建产物的不可变 GitHub tag 安装：
+安装已公开发布的 npm Beta：
 
 ```sh
-dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-alpha.3'
+dsh plugin --profile web add dsh-codex-connect-plus@beta
 ```
 
-从 GitHub Release 下载 `.tgz` 后：
+不可变 GitHub 备用安装方式：
 
 ```sh
-dsh plugin --profile web add /path/to/dsh-codex-connect-plus-0.1.0-alpha.3.tgz
+dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-beta.1'
 ```
+
+GitHub 预发布中也附带了对应的 `.tgz`。
 
 本地开发链接：
 
