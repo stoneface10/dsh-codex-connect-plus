@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## 0.1.0-beta.4 - 2026-08-18
+
+### Fixed
+
+- The Plugin configuration card now appears on Harness `0.1.0-rc.7`: the card's keyed-slot `key` now matches its settings namespace (`llm-openai-codex`), which the rc.7 configurable-plugins tab uses to dispatch cards.
+
 ### Documentation
 
 - Documented the requirement for DeepSeek Harness `0.1.0-rc.7` or newer (settings-card keyed-slot API) and the `0.1.0-beta.2` fallback for rc.5/rc.6-era Harness.

@@ -6,7 +6,7 @@ describe('OpenAI Codex browser contribution', () => {
     const client = await readFile(new URL('../src/client/index.tsx', import.meta.url), 'utf8')
     expect(client).toContain("ctx.slots.inject('settings.plugin.item'")
     expect(client).toContain("name: 'settings.plugin.item'")
-    expect(client).toContain("key: 'openai-codex'")
+    expect(client).toContain('key: OPENAI_CODEX_SETTINGS_NAMESPACE')
     expect(client).toContain('priority: 30')
     expect(client).toContain('ctx.settingsScope.bind')
     expect(client).toContain('OPENAI_CODEX_SETTINGS_NAMESPACE')

@@ -54,7 +54,7 @@ dsh plugin --profile web add dsh-codex-connect-plus@beta
 Immutable GitHub fallback:
 
 ```sh
-dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-beta.3'
+dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-beta.4'
 ```
 
 A matching `.tgz` is also attached to the GitHub prerelease.
