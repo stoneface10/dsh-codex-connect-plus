@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+### Documentation
+
+- Documented the requirement for DeepSeek Harness `0.1.0-rc.7` or newer (settings-card keyed-slot API) and the `0.1.0-beta.2` fallback for rc.5/rc.6-era Harness.
+
 ## 0.1.0-beta.3 - 2026-08-18
 
 ### Changed

@@ -38,6 +38,11 @@ Sign in once with ChatGPT OAuth. Codex model requests use the signed-in account'
 - Durable DSH attachments, session-authorized replay, inline preview, and local files under `outputs/codex-image`.
 - Fixed upstream origins, no redirects, bounded inputs/responses, cancellation, timeout, strict image signatures, and redacted provider errors.
 
+## Requirements
+
+- **DeepSeek Harness `0.1.0-rc.7` or newer.** This release is adapted to the rc.7 keyed-slot settings-card API. On older Harness versions the package still installs (the plugin system does not enforce peer ranges), but the Plugin configuration card may not render, so upgrade Harness first or stay on `0.1.0-beta.2` for `0.1.0-rc.5`/`rc.6`-era Harness.
+- Node.js `^22.19.0 || >=24.0.0`.
+
 ## Install
 
 Install the public npm beta:

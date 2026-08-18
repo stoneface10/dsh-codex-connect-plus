@@ -12,6 +12,8 @@ Install `dsh-codex-connect-plus` into one requested DeepSeek Harness profile wit
 
 ## Install and validate
 
+0. Confirm Harness is at least `0.1.0-rc.7` (`dsh --version`). Older Harness versions still install the package but may not render the Plugin configuration card; for `0.1.0-rc.5`/`rc.6`-era Harness use `0.1.0-beta.2`.
+
 1. Check `dsh --version` or `dsh --help`. From a Harness checkout use `pnpm dsh`.
 2. Install the public npm beta:
 
