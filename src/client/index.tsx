@@ -45,8 +45,8 @@ export function apply(ctx: ClientContext): void {
   })
   ctx.slots.inject('settings.plugin.item', () => ctx.slots.register({
     name: 'settings.plugin.item',
-    id: 'openai-codex',
-    order: 30,
+    key: 'openai-codex',
+    priority: 30,
     inject: (): OpenAICodexPluginCardInjected => ({ t, configScope }),
   }, OpenAICodexPluginCard))
   for (const key of [CODEX_IMAGE_GENERATE_TOOL_NAME, CODEX_IMAGE_EDIT_TOOL_NAME]) {

@@ -4,6 +4,14 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## 0.1.0-beta.3 - 2026-08-18
+
+### Changed
+
+- Updated the development and peer compatibility baseline to DeepSeek Harness `0.1.0-rc.7`.
+- Migrated the Plugin configuration card to the rc.7 keyed-slot API (`key`/`priority`).
+- Updated the compaction replay test to the rc.7 pi-ai v2 replay envelope, preserving encrypted reasoning and paired tool history.
+
 ## 0.1.0-beta.2 - 2026-08-17
 
 ### Changed
