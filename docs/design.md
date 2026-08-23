@@ -20,6 +20,8 @@ When `enableSearch: true`, the plugin registers its standalone search provider a
 
 When `enableImageTool: true`, `view_image` is registered only after tools, filesystem, and attachment services are available. Local files remain bounded by the Harness filesystem surface. Remote images allow only credential-free public HTTP(S): all DNS answers must be public unicast, each redirect is revalidated, and each socket is pinned to the validated address to close DNS-rebinding gaps. The tool also checks bounded bytes, accepted media signatures, and current-model image support before saving a Harness attachment.
 
+User-uploaded and tool-produced images follow the normal `PiAiAdapter` attachment path independently of `view_image`. The Codex profile gives Harness explicit aggregate payload, pixel, and encoded-byte budgets so attachment preprocessing succeeds before the provider request is assembled.
+
 When `enableImageGeneration: true`, the plugin registers `codex_image_generate` and `codex_image_edit`. Both use the same provider-native OAuth runtime as the model adapter. Requests target fixed HTTPS Codex application endpoints, reject redirects, propagate cancellation, enforce a ten-minute timeout and byte limits, and never retry ambiguous failures. Outputs are written under the session cwd, persisted to Harness attachments before the tool result lands, and replayed through the owning session's authorized attachment API.
 
 ## Conflicts and diagnostics
@@ -28,4 +30,4 @@ Before registration the plugin checks current provider ids. An existing `openai-
 
 ## Compatibility boundary
 
-The Beta pins Harness `0.1.0-rc.7` development dependencies and its settings-card registration uses the rc.7 keyed-slot API; supported Node.js is `^22.19.0 || >=24.0.0`. It pins `@earendil-works/pi-ai` `0.82.1`. Backend eligibility, quotas, models, and protocol details remain controlled upstream. Tests use temporary OAuth documents and mocked network responses; CI does not perform real authentication.
+The Beta pins Harness `0.1.1-rc.2` development dependencies and uses its current pi-ai auth and image-request APIs; supported Node.js is `^22.19.0 || >=24.0.0`. It pins `@earendil-works/pi-ai` `0.82.1`. Backend eligibility, quotas, models, and protocol details remain controlled upstream. Tests use temporary OAuth documents and mocked network responses; CI does not perform real authentication.

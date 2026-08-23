@@ -12,7 +12,7 @@ Install `dsh-codex-connect-plus` into one requested DeepSeek Harness profile wit
 
 ## Install and validate
 
-0. Confirm Harness is at least `0.1.0-rc.7` (`dsh --version`). Older Harness versions still install the package but may not render the Plugin configuration card; for `0.1.0-rc.5`/`rc.6`-era Harness use `0.1.0-beta.2`.
+0. Confirm Harness is at least `0.1.1-rc.2` (`dsh --version`). Use plugin `0.1.0-beta.4` only with the older Harness `0.1.0-rc.7` line.
 
 1. Check `dsh --version` or `dsh --help`. From a Harness checkout use `pnpm dsh`.
 2. Install the public npm beta:
@@ -21,7 +21,7 @@ Install `dsh-codex-connect-plus` into one requested DeepSeek Harness profile wit
    dsh plugin --profile web add dsh-codex-connect-plus@beta
    ```
 
-   For a reproducible fallback, use the immutable `v0.1.0-beta.4` GitHub tag or download the matching prerelease `.tgz` and verify its published SHA-256 before installation.
+   For a reproducible fallback, use the immutable `v0.1.0-beta.5` GitHub tag or download the matching prerelease `.tgz` and verify its published SHA-256 before installation.
 
 3. Run `dsh --profile web --dump-config` and require exactly one `llm-openai-codex` row loading `dsh-codex-connect-plus`.
 4. Confirm the effective `agent-default-model` and `web.searchProvider` values are unchanged from before installation.

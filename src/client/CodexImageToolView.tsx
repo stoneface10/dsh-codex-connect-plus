@@ -4,12 +4,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { CSSProperties } from 'react'
 import type { ImageAttachmentRef } from '@deepseek-ai/dsh-attachment'
-import type { ImageLoader } from '@deepseek-ai/dsh-client-ui-attachment'
 import type { ToolCallViewProps } from '@deepseek-ai/dsh-client-ui-tool/client'
 import { CODEX_IMAGE_EDIT_TOOL_NAME } from '../images/contract.ts'
+import type { CodexImageLoader } from './image-loader.ts'
 
 export interface CodexImageToolViewInjected {
-  loadImage: ImageLoader
+  loadImage: CodexImageLoader
 }
 
 type CodexImageToolViewProps = ToolCallViewProps & Partial<CodexImageToolViewInjected>
@@ -41,7 +41,7 @@ function imagesOf(block: ToolCallViewProps['block']): readonly ImageAttachmentRe
 
 function AuthorizedImage({ image, loadImage, alt, onOpen }: {
   image: ImageAttachmentRef
-  loadImage: ImageLoader
+  loadImage: CodexImageLoader
   alt: string
   onOpen: (url: string) => void
 }) {

@@ -1,8 +1,8 @@
 /* dsh-codex-connect-plus original modifications; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /** Shared provider-native OAuth runtime for models and optional Codex capabilities. */
 
-import { createModels } from '@earendil-works/pi-ai'
-import type { MutableModels, Provider } from '@earendil-works/pi-ai'
+import { createModels, defaultProviderAuthContext } from '@earendil-works/pi-ai'
+import type { AuthContext, MutableModels, Provider } from '@earendil-works/pi-ai'
 import { openaiCodexProvider } from '@earendil-works/pi-ai/providers/openai-codex'
 import type { OpenAICodexCredentialStore } from './store.ts'
 import { OPENAI_CODEX_PROVIDER } from './store.ts'
@@ -19,11 +19,14 @@ export interface OpenAICodexAuthorizedAccount {
  */
 export class OpenAICodexAuthRuntime {
   readonly provider: Provider
+  /** Durable credential store and ambient auth context shared with every Codex adapter collection. */
+  readonly adapterAuth: { credentials: OpenAICodexCredentialStore; authContext: AuthContext }
   private readonly models: MutableModels
 
   constructor(private readonly credentials: OpenAICodexCredentialStore) {
     this.provider = openaiCodexProvider()
-    this.models = createModels({ credentials })
+    this.adapterAuth = { credentials, authContext: defaultProviderAuthContext() }
+    this.models = createModels(this.adapterAuth)
     this.models.setProvider(this.provider)
   }
 

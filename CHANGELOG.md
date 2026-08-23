@@ -4,6 +4,19 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
+## 0.1.0-beta.5 - 2026-08-23
+
+### Fixed
+
+- Codex image-bearing model requests now provide the pixel, per-image byte, and aggregate request budgets required by DeepSeek Harness `0.1.1-rc.2`, preventing attachment preprocessing from failing before provider dispatch.
+- The Codex adapter now shares its durable OAuth credential store and auth context with the current pi-ai adapter API.
+- Generated-image client previews no longer depend on the removed `ImageLoader` export from DSH's attachment UI package.
+- Release tests now force `NODE_ENV=test`, so an ambient production environment cannot load React's production build into Testing Library.
+
+### Changed
+
+- Updated the development and peer compatibility baseline to DeepSeek Harness `0.1.1-rc.2`.
+
 ## 0.1.0-beta.4 - 2026-08-18
 
 ### Fixed

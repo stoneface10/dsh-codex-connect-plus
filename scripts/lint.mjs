@@ -51,7 +51,7 @@ for (const filename of ['src/images/protocol.ts', 'src/images/tools.ts', 'src/cl
 }
 
 const readme = await readFile(new URL('../README.md', import.meta.url), 'utf8')
-if (!readme.startsWith('# Codex Connect Plus\n')) failures.push('README opening mismatch')
+if (!/^# Codex Connect Plus\r?\n/u.test(readme)) failures.push('README opening mismatch')
 if (!readme.includes('English | [中文](docs/README.zh.md)')) failures.push('README must link the Chinese guide')
 if (!readme.includes('<img src="docs/assets/hero.jpg"')) failures.push('README must display the product hero')
 if (!readme.includes('<img src="docs/assets/demo-codex-image-and-models.png"')) failures.push('README must display the real Codex and image-generation demo')

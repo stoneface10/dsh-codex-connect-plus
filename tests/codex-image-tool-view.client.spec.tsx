@@ -4,7 +4,7 @@ import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { ToolCallViewProps } from '@deepseek-ai/dsh-client-ui-tool/client'
 import { CodexImageToolView } from '../src/client/CodexImageToolView.tsx'
-import { CODEX_IMAGE_GENERATE_TOOL_NAME } from '../src/images/tools.ts'
+import { CODEX_IMAGE_GENERATE_TOOL_NAME } from '../src/images/contract.ts'
 
 afterEach(() => {
   cleanup()

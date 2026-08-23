@@ -11,6 +11,12 @@ import { OPENAI_CODEX_PROVIDER } from './store.ts'
 
 /** Provider idle ceiling used by the composite route. */
 export const OPENAI_CODEX_STREAM_IDLE_TIMEOUT_MS = 300_000
+/** Aggregate base64 image-payload ceiling for one model request. */
+export const OPENAI_CODEX_MAX_REQUEST_IMAGE_BYTES = 20 * 1024 * 1024
+/** Total pixels retained in each deterministic inline request image. */
+export const OPENAI_CODEX_REQUEST_IMAGE_PIXEL_BUDGET = 2048 * 2048
+/** Encoded-byte ceiling for each deterministic inline request image. */
+export const OPENAI_CODEX_REQUEST_IMAGE_MAX_BYTES = 1024 * 1024
 
 /**
  * Give the generic dsh adapter a request-scoped bearer-token entry without
@@ -36,6 +42,24 @@ function requestProvider(provider: Provider): Provider {
   }
 }
 
+/** Build the complete current-DSH profile used by one Codex adapter generation. */
+export function createOpenAICodexProfile(provider: Provider, maxRetries: number): ResolvedPiAiProviderProfile {
+  return {
+    provider: OPENAI_CODEX_PROVIDER,
+    displayName: 'OpenAI Codex',
+    streamIdleTimeoutMs: OPENAI_CODEX_STREAM_IDLE_TIMEOUT_MS,
+    maxRequestImageBytes: OPENAI_CODEX_MAX_REQUEST_IMAGE_BYTES,
+    requestImagePixelBudget: OPENAI_CODEX_REQUEST_IMAGE_PIXEL_BUDGET,
+    requestImageMaxBytes: OPENAI_CODEX_REQUEST_IMAGE_MAX_BYTES,
+    retryPolicy: resolveRetryPolicy(
+      { mode: 'normal', maxRetries },
+      'dsh-codex-connect-plus retryPolicy',
+    ),
+    configuredMaxTokens: new Map(),
+    piProvider: requestProvider(provider),
+  }
+}
+
 /**
  * Create the Codex subscription adapter without requiring a dsh fork. The
  * public pi-ai adapter owns Harness message conversion, image attachment
@@ -54,22 +78,16 @@ export function createOpenAICodexAdapter(
     const maxRetries = resolveModelMaxRetries()
     if (cachedProfiles !== undefined && cachedMaxRetries === maxRetries) return cachedProfiles
     cachedMaxRetries = maxRetries
-    cachedProfiles = new Map<string, ResolvedPiAiProviderProfile>([[OPENAI_CODEX_PROVIDER, {
-      provider: OPENAI_CODEX_PROVIDER,
-      displayName: 'OpenAI Codex',
-      streamIdleTimeoutMs: OPENAI_CODEX_STREAM_IDLE_TIMEOUT_MS,
-      retryPolicy: resolveRetryPolicy(
-        { mode: 'normal', maxRetries },
-        'dsh-codex-connect-plus retryPolicy',
-      ),
-      configuredMaxTokens: new Map(),
-      piProvider: requestProvider(provider),
-    }]])
+    cachedProfiles = new Map<string, ResolvedPiAiProviderProfile>([[
+      OPENAI_CODEX_PROVIDER,
+      createOpenAICodexProfile(provider, maxRetries),
+    ]])
     return cachedProfiles
   }
   return new PiAiAdapter({
     profiles,
     resolveApiKey: () => auth.accessToken(),
+    auth: auth.adapterAuth,
     resolveAttachments,
   })
 }

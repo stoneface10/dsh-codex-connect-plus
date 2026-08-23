@@ -1,11 +1,14 @@
 /* dsh-codex-connect-plus image attachment integration; Copyright 2026 0751; Apache-2.0, third-party notices in THIRD_PARTY_NOTICES.md. */
 /** Session-authorized image loader for generated attachment references. */
 
-import type { ImageLoader } from '@deepseek-ai/dsh-client-ui-attachment'
+import type { ImageAttachmentRef } from '@deepseek-ai/dsh-attachment'
 import type { ISessions, SessionId } from '@deepseek-ai/dsh-client-runtime/client'
 
+/** Resolve a generated attachment to a short-lived browser object URL. */
+export type CodexImageLoader = (attachment: ImageAttachmentRef) => Promise<string>
+
 /** Create an uncached object-URL loader; the consuming component owns revocation. */
-export function createCodexImageLoader(sessions: ISessions, sessionId: SessionId): ImageLoader {
+export function createCodexImageLoader(sessions: ISessions, sessionId: SessionId): CodexImageLoader {
   return async attachment => {
     const session = sessions.binding(sessionId)?.session
     if (session === undefined) throw new Error(`Unknown session: ${sessionId}`)

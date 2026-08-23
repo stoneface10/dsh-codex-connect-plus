@@ -26,6 +26,7 @@ describe('shared OpenAI Codex auth runtime', () => {
     }
     await store.modify(OPENAI_CODEX_PROVIDER, () => Promise.resolve(credential))
     const runtime = new OpenAICodexAuthRuntime(store)
+    expect(runtime.adapterAuth.credentials).toBe(store)
     await expect(runtime.accessToken()).resolves.toBe('current-access')
     await expect(runtime.authorizedAccount()).resolves.toEqual({
       accessToken: 'current-access',

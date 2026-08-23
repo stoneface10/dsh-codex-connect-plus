@@ -1,4 +1,4 @@
 # Bilingual-pair consistency record for the design document. Re-record with:
 #   git hash-object docs/design.md docs/design.zh.md
-design.md: d096204d5427a713f1aae9f87baa0a4483c64984
-design.zh.md: 7ab9c2e4cf087481f2cfc12f412624f096ad9ad2
+design.md: e05448b6e47128c7a6ff6eda0ad0f68e1bd7c0aa
+design.zh.md: 68a0184f66f60e5f191e22a799b21058d2c43a2e

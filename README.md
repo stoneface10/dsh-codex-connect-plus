@@ -40,7 +40,7 @@ Sign in once with ChatGPT OAuth. Codex model requests use the signed-in account'
 
 ## Requirements
 
-- **DeepSeek Harness `0.1.0-rc.7` or newer.** This release is adapted to the rc.7 keyed-slot settings-card API. On older Harness versions the package still installs (the plugin system does not enforce peer ranges), but the Plugin configuration card may not render, so upgrade Harness first or stay on `0.1.0-beta.2` for `0.1.0-rc.5`/`rc.6`-era Harness.
+- **DeepSeek Harness `0.1.1-rc.2` or newer.** This release supplies the current pi-ai auth injection and image-request preprocessing budgets. Use `0.1.0-beta.4` only with the older `0.1.0-rc.7` Harness line.
 - Node.js `^22.19.0 || >=24.0.0`.
 
 ## Install
@@ -54,7 +54,7 @@ dsh plugin --profile web add dsh-codex-connect-plus@beta
 Immutable GitHub fallback:
 
 ```sh
-dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-beta.4'
+dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-beta.5'
 ```
 
 A matching `.tgz` is also attached to the GitHub prerelease.
@@ -84,7 +84,7 @@ enableImageTool: false
 enableImageGeneration: true
 ```
 
-The package does not take over the profile's default model or global search route. `modelMaxRetries: 0` avoids silently repeating a full subscription-backed request after a transient failure; users may deliberately select one or two retries in Plugin configuration when reliability matters more than quota conservation. Image generation/editing remains non-retrying because the provider may already have processed a timed-out request.
+The package does not take over the profile's default model or global search route. `modelMaxRetries: 0` avoids silently repeating a full subscription-backed request after a transient failure; users may deliberately select one or two retries in Plugin configuration when reliability matters more than quota conservation. Image generation/editing remains non-retrying because the provider may already have processed a timed-out request. Leave `enableImageTool` disabled when direct multimodal uploads and DSH's native `read_image` cover the workflow; enable it only when the model must open credential-free public HTTP(S) image URLs directly.
 
 ## Image tools
 

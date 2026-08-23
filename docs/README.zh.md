@@ -40,7 +40,7 @@
 
 ## 版本要求
 
-- **DeepSeek Harness `0.1.0-rc.7` 或更新版本。** 本版本适配了 rc.7 的 keyed-slot 设置卡 API。在更旧的 Harness 上，插件仍可安装（插件系统不强制 peer 范围），但“插件配置”卡片可能不显示；请先升级 Harness，或针对 `0.1.0-rc.5`/`rc.6` 时代的 Harness 继续使用 `0.1.0-beta.2`。
+- **DeepSeek Harness `0.1.1-rc.2` 或更新版本。** 本版本提供当前 pi-ai Adapter 所需的认证注入和图片请求预处理预算。旧的 Harness `0.1.0-rc.7` 系列请继续使用 `0.1.0-beta.4`。
 - Node.js `^22.19.0 || >=24.0.0`。
 
 ## 安装
@@ -54,7 +54,7 @@ dsh plugin --profile web add dsh-codex-connect-plus@beta
 不可变 GitHub 备用安装方式：
 
 ```sh
-dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-beta.4'
+dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-beta.5'
 ```
 
 GitHub 预发布中也附带了对应的 `.tgz`。
@@ -84,7 +84,7 @@ enableImageTool: false
 enableImageGeneration: true
 ```
 
-插件不会接管默认模型或全局搜索路由。`modelMaxRetries: 0` 可避免瞬时失败后静默重放整次订阅请求；当可靠性比额度节省更重要时，用户可以在插件配置中显式选择重试 1–2 次。图片生成/编辑继续保持不重试，因为超时请求可能已被上游处理。
+插件不会接管默认模型或全局搜索路由。`modelMaxRetries: 0` 可避免瞬时失败后静默重放整次订阅请求；当可靠性比额度节省更重要时，用户可以在插件配置中显式选择重试 1–2 次。图片生成/编辑继续保持不重试，因为超时请求可能已被上游处理。如果直接多模态上传和 DSH 原生 `read_image` 已能覆盖工作流，请保持 `enableImageTool` 关闭；仅在模型必须直接打开不含凭据的公网 HTTP(S) 图片 URL 时启用。
 
 ## 图片工具
 
