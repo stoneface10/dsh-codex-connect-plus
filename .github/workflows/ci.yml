@@ -17,14 +17,28 @@ jobs:
         node: ['22.19.0', '24']
     runs-on: ubuntu-latest
     name: Validate (Node ${{ matrix.node }})
+    defaults:
+      run:
+        working-directory: dsh-codex-connect-plus
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: dsh-codex-connect-plus
+      - uses: actions/checkout@v4
+        with:
+          repository: deepseek-ai/DeepSeek-Harness
+          ref: dsh-v0.1.2-alpha.1
+          path: DSH
       - uses: pnpm/action-setup@v4
         with:
           version: 10.30.3
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
+      - name: Build pinned DeepSeek Harness packages
+        run: |
+          pnpm --dir ../DSH --config.minimum-release-age=0 install --frozen-lockfile
+          pnpm --dir ../DSH run build:lib
       - run: pnpm --config.minimum-release-age=0 install --frozen-lockfile
       - name: Lint package and source hygiene
         run: pnpm run lint
