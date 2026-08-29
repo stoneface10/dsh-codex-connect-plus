@@ -40,15 +40,22 @@
 
 ## 版本要求
 
-- **DeepSeek Harness `0.1.1-rc.2` 或更新版本。** 本版本提供当前 pi-ai Adapter 所需的认证注入和图片请求预处理预算。旧的 Harness `0.1.0-rc.7` 系列请继续使用 `0.1.0-beta.4`。
+- **DeepSeek Harness `0.1.1-rc.2`。** 本构建面向 rc.2 Client API；DSH `0.1.2-alpha.1` 必须改用插件 `0.1.0-beta.6`。
 - Node.js `^22.19.0 || >=24.0.0`。
+
+| DSH 版本 | 兼容插件 | npm 安装标识 |
+| --- | --- | --- |
+| `0.1.0-rc.5` / `0.1.0-rc.6` | `0.1.0-beta.2` | `dsh-codex-connect-plus@0.1.0-beta.2` |
+| `0.1.0-rc.7` | `0.1.0-beta.4` | `dsh-codex-connect-plus@0.1.0-beta.4` |
+| `0.1.1-rc.2` | `0.1.0-beta.5` | `dsh-codex-connect-plus@latest` |
+| `0.1.2-alpha.1` | `0.1.0-beta.6` | `dsh-codex-connect-plus@beta` |
 
 ## 安装
 
-安装已公开发布的 npm Beta：
+DSH `0.1.1-rc.2` 默认安装 npm `latest`：
 
 ```sh
-dsh plugin --profile web add dsh-codex-connect-plus@beta
+dsh plugin --profile web add dsh-codex-connect-plus@latest
 ```
 
 不可变 GitHub 备用安装方式：

@@ -5,11 +5,26 @@
   "version": "0.1.0-beta.5",
   "author": "0751",
   "contributors": [
-    "Frank Song (dsh-codex-connect author)",
-    "Yan-Zero (original dsh-codex author)",
-    "JuneLearn (dsh-image2-draw portions)",
-    "ningzimu (codex-gpt-image portions)",
-    "MC5lan/dsh-multimodal contributors (attachment and tool-card portions)"
+    {
+      "name": "Frank Song",
+      "url": "https://github.com/franksong2702/dsh-codex-connect"
+    },
+    {
+      "name": "Yan-Zero",
+      "url": "https://github.com/Yan-Zero/dsh-codex"
+    },
+    {
+      "name": "JuneLearn",
+      "url": "https://github.com/JuneLearn/dsh-image2-draw"
+    },
+    {
+      "name": "ningzimu",
+      "url": "https://github.com/ningzimu/codex-gpt-image"
+    },
+    {
+      "name": "dsh-multimodal contributors",
+      "url": "https://github.com/MC5lan/dsh-multimodal"
+    }
   ],
   "keywords": [
     "dsh-plugin",
@@ -24,7 +39,7 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/",
-    "tag": "beta"
+    "tag": "latest"
   },
   "repository": {
     "type": "git",

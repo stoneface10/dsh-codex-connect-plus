@@ -7,17 +7,20 @@ if (packageJson.name !== 'dsh-codex-connect-plus') failures.push('package name m
 const releaseMatch = /^0\.1\.0-(alpha|beta)\.[1-9]\d*(?:\.\d+)?$/u.exec(packageJson.version)
 if (!releaseMatch) failures.push('package version must be a 0.1.0 alpha or beta release')
 const releaseChannel = releaseMatch?.[1]
-if (releaseChannel && packageJson.publishConfig?.tag !== releaseChannel) failures.push(`publishConfig.tag must be ${releaseChannel}`)
+const installTag = packageJson.publishConfig?.tag
+if (releaseChannel && !['alpha', 'beta', 'latest'].includes(installTag)) failures.push('publishConfig.tag must identify the intended prerelease install channel')
 if (packageJson.displayName !== 'Codex Connect Plus') failures.push('displayName mismatch')
 if (packageJson.author !== '0751') failures.push('package author must identify the derivative owner')
 for (const contributor of [
-  'Frank Song (dsh-codex-connect author)',
-  'Yan-Zero (original dsh-codex author)',
-  'JuneLearn (dsh-image2-draw portions)',
-  'ningzimu (codex-gpt-image portions)',
-  'MC5lan/dsh-multimodal contributors (attachment and tool-card portions)',
+  { name: 'Frank Song', url: 'https://github.com/franksong2702/dsh-codex-connect' },
+  { name: 'Yan-Zero', url: 'https://github.com/Yan-Zero/dsh-codex' },
+  { name: 'JuneLearn', url: 'https://github.com/JuneLearn/dsh-image2-draw' },
+  { name: 'ningzimu', url: 'https://github.com/ningzimu/codex-gpt-image' },
+  { name: 'dsh-multimodal contributors', url: 'https://github.com/MC5lan/dsh-multimodal' },
 ]) {
-  if (!Array.isArray(packageJson.contributors) || !packageJson.contributors.includes(contributor)) failures.push(`missing contributor: ${contributor}`)
+  if (!Array.isArray(packageJson.contributors) || !packageJson.contributors.some(entry => entry?.name === contributor.name && entry?.url === contributor.url)) {
+    failures.push(`missing contributor: ${contributor.name}`)
+  }
 }
 for (const keyword of ['dsh-plugin', 'deepseek-harness', 'openai-codex', 'chatgpt-oauth', 'gpt-image-2']) {
   if (!Array.isArray(packageJson.keywords) || !packageJson.keywords.includes(keyword)) failures.push(`package keywords must include ${keyword}`)
@@ -56,11 +59,11 @@ if (!readme.includes('English | [中文](docs/README.zh.md)')) failures.push('RE
 if (!readme.includes('<img src="docs/assets/hero.jpg"')) failures.push('README must display the product hero')
 if (!readme.includes('<img src="docs/assets/demo-codex-image-and-models.png"')) failures.push('README must display the real Codex and image-generation demo')
 if (!readme.includes(`github:stoneface10/dsh-codex-connect-plus#v${packageJson.version}`)) failures.push('README must pin the current GitHub release tag')
-if (releaseChannel && !readme.includes(`dsh-codex-connect-plus@${releaseChannel}`)) failures.push('README must advertise the matching npm prerelease channel')
+if (installTag && !readme.includes(`dsh-codex-connect-plus@${installTag}`)) failures.push('README must advertise the configured npm install tag')
 if (readme.includes('not yet published to npm')) failures.push('README must not claim the package is unpublished')
 const chinese = await readFile(new URL('../docs/README.zh.md', import.meta.url), 'utf8')
 if (!chinese.includes(`github:stoneface10/dsh-codex-connect-plus#v${packageJson.version}`)) failures.push('Chinese README must pin the current GitHub release tag')
-if (releaseChannel && !chinese.includes(`dsh-codex-connect-plus@${releaseChannel}`)) failures.push('Chinese README must advertise the matching npm prerelease channel')
+if (installTag && !chinese.includes(`dsh-codex-connect-plus@${installTag}`)) failures.push('Chinese README must advertise the configured npm install tag')
 if (chinese.includes('尚未发布到 npm')) failures.push('Chinese README must not claim the package is unpublished')
 try {
   await stat(new URL('../README.zh.md', import.meta.url))

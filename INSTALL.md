@@ -12,13 +12,13 @@ Install `dsh-codex-connect-plus` into one requested DeepSeek Harness profile wit
 
 ## Install and validate
 
-0. Confirm Harness is at least `0.1.1-rc.2` (`dsh --version`). Use plugin `0.1.0-beta.4` only with the older Harness `0.1.0-rc.7` line.
+0. Confirm Harness is exactly on the `0.1.1-rc.2` compatibility line (`dsh --version`). DSH `0.1.2-alpha.1` requires plugin `0.1.0-beta.6`; DSH `0.1.0-rc.7` requires plugin `0.1.0-beta.4`.
 
 1. Check `dsh --version` or `dsh --help`. From a Harness checkout use `pnpm dsh`.
-2. Install the public npm beta:
+2. Install the npm release selected for the rc.2 compatibility line:
 
    ```sh
-   dsh plugin --profile web add dsh-codex-connect-plus@beta
+   dsh plugin --profile web add dsh-codex-connect-plus@latest
    ```
 
    For a reproducible fallback, use the immutable `v0.1.0-beta.5` GitHub tag or download the matching prerelease `.tgz` and verify its published SHA-256 before installation.

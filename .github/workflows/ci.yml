@@ -47,5 +47,5 @@ jobs:
       - name: Validate package contents
         run: pnpm run pack:check
 
-  # Alpha CI deliberately has no npm-publish job. Publishing requires a later,
+  # Prerelease CI deliberately has no npm-publish job. Publishing requires a later,
   # separately authorized release workflow.

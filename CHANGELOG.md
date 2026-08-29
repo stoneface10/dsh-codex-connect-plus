@@ -4,7 +4,7 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
-## 0.1.0-beta.5 - 2026-08-23
+## 0.1.0-beta.5 - 2026-08-29
 
 ### Fixed
 

@@ -40,15 +40,22 @@ Sign in once with ChatGPT OAuth. Codex model requests use the signed-in account'
 
 ## Requirements
 
-- **DeepSeek Harness `0.1.1-rc.2` or newer.** This release supplies the current pi-ai auth injection and image-request preprocessing budgets. Use `0.1.0-beta.4` only with the older `0.1.0-rc.7` Harness line.
+- **DeepSeek Harness `0.1.1-rc.2`.** This build targets the rc.2 Client APIs. DSH `0.1.2-alpha.1` requires plugin `0.1.0-beta.6` instead.
 - Node.js `^22.19.0 || >=24.0.0`.
+
+| DSH version | Compatible plugin | npm selector |
+| --- | --- | --- |
+| `0.1.0-rc.5` / `0.1.0-rc.6` | `0.1.0-beta.2` | `dsh-codex-connect-plus@0.1.0-beta.2` |
+| `0.1.0-rc.7` | `0.1.0-beta.4` | `dsh-codex-connect-plus@0.1.0-beta.4` |
+| `0.1.1-rc.2` | `0.1.0-beta.5` | `dsh-codex-connect-plus@latest` |
+| `0.1.2-alpha.1` | `0.1.0-beta.6` | `dsh-codex-connect-plus@beta` |
 
 ## Install
 
-Install the public npm beta:
+Install the default npm release for DSH `0.1.1-rc.2`:
 
 ```sh
-dsh plugin --profile web add dsh-codex-connect-plus@beta
+dsh plugin --profile web add dsh-codex-connect-plus@latest
 ```
 
 Immutable GitHub fallback:

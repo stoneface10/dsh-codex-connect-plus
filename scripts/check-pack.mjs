@@ -36,6 +36,7 @@ try {
     : packArgs
   const result = spawnSync(command, args, {
     cwd: new URL('..', import.meta.url),
+    env: { ...process.env, npm_config_dry_run: 'false' },
     stdio: 'inherit',
   })
   if (result.error !== undefined) throw result.error
