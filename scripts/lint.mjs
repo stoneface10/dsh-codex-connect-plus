@@ -11,13 +11,15 @@ if (releaseChannel && packageJson.publishConfig?.tag !== releaseChannel) failure
 if (packageJson.displayName !== 'Codex Connect Plus') failures.push('displayName mismatch')
 if (packageJson.author !== '0751') failures.push('package author must identify the derivative owner')
 for (const contributor of [
-  'Frank Song (dsh-codex-connect author)',
-  'Yan-Zero (original dsh-codex author)',
-  'JuneLearn (dsh-image2-draw portions)',
-  'ningzimu (codex-gpt-image portions)',
-  'MC5lan/dsh-multimodal contributors (attachment and tool-card portions)',
+  { name: 'Frank Song', url: 'https://github.com/franksong2702/dsh-codex-connect' },
+  { name: 'Yan-Zero', url: 'https://github.com/Yan-Zero/dsh-codex' },
+  { name: 'JuneLearn', url: 'https://github.com/JuneLearn/dsh-image2-draw' },
+  { name: 'ningzimu', url: 'https://github.com/ningzimu/codex-gpt-image' },
+  { name: 'dsh-multimodal contributors', url: 'https://github.com/MC5lan/dsh-multimodal' },
 ]) {
-  if (!Array.isArray(packageJson.contributors) || !packageJson.contributors.includes(contributor)) failures.push(`missing contributor: ${contributor}`)
+  if (!Array.isArray(packageJson.contributors) || !packageJson.contributors.some(entry => entry?.name === contributor.name && entry?.url === contributor.url)) {
+    failures.push(`missing contributor: ${contributor.name}`)
+  }
 }
 for (const keyword of ['dsh-plugin', 'deepseek-harness', 'openai-codex', 'chatgpt-oauth', 'gpt-image-2']) {
   if (!Array.isArray(packageJson.keywords) || !packageJson.keywords.includes(keyword)) failures.push(`package keywords must include ${keyword}`)
