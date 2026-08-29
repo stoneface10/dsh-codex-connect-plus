@@ -6,7 +6,9 @@ The package registers `openai-codex` through Harness's public `LlmRuntime` and `
 
 The bundle patch inserts only `llm-openai-codex`. It never writes `agent-default-model` or `web.searchProvider`. `enableSearch` and `enableImageTool` default to `false`; `enableImageGeneration` defaults to `true`. Optional service injections are not registered while disabled, and an image-capability activation failure does not prevent the Codex model adapter from loading.
 
-The Host registers `llm-openai-codex` as the plugin-owned settings namespace and declares `OpenAI Codex` in the LLM configurable-provider directory. The browser binds that namespace through Harness's settings-scope transport and renders account, quota, Save/Discard capability controls in the existing Plugin configuration card. Revision-fenced field writes preserve unrelated settings. Committed changes reconcile search and image registrations live; the default-model and global-search namespaces are never written.
+The Host registers `llm-openai-codex` as the plugin-owned settings namespace and declares `OpenAI Codex` in the LLM configurable-provider directory. The browser binds that namespace through Harness's settings-scope transport and renders account, quota, Save/Discard capability controls in the existing Plugin configuration card. One revision-fenced atomic namespace mutation preserves unrelated settings. Committed changes reconcile search and image registrations live; the default-model and global-search namespaces are never written.
+
+The model route owns a bounded normal retry policy executed by Harness's existing `llm-retry` plugin. `modelMaxRetries` defaults to zero and can be raised to ten; enabled retries use 1–30 second exponential backoff. `PI_AI_ERROR` is temporarily eligible because pi-ai 0.84.2 flattens some transient Codex WebSocket and server-overload failures into that code. This compatibility fallback is bounded and does not apply to image generation or editing.
 
 ## OAuth persistence
 
@@ -30,4 +32,4 @@ Before registration the plugin checks current provider ids. An existing `openai-
 
 ## Compatibility boundary
 
-The Beta pins Harness `0.1.1-rc.2` development dependencies and uses its current pi-ai auth and image-request APIs; supported Node.js is `^22.19.0 || >=24.0.0`. It pins `@earendil-works/pi-ai` `0.82.1`. Backend eligibility, quotas, models, and protocol details remain controlled upstream. Tests use temporary OAuth documents and mocked network responses; CI does not perform real authentication.
+The Beta pins Harness `0.1.2-alpha.1` development dependencies and uses its current pi-ai auth and image-request APIs; supported Node.js is `^22.19.0 || >=24.0.0`. It pins `@earendil-works/pi-ai` `0.84.2`. Backend eligibility, quotas, models, and protocol details remain controlled upstream. Tests use temporary OAuth documents and mocked network responses; CI does not perform real authentication.

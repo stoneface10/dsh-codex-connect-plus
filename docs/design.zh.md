@@ -6,7 +6,9 @@
 
 bundle patch 只插入 `llm-openai-codex`，不会写入 `agent-default-model` 或 `web.searchProvider`。`enableSearch` 与 `enableImageTool` 默认均为 `false`，`enableImageGeneration` 默认为 `true`；关闭时不会注册对应可选服务，图片能力激活失败也不会阻止 Codex 模型适配器加载。
 
-Host 将 `llm-openai-codex` 注册为插件自有 settings namespace，并在 LLM 可配置 provider 目录中声明显示名为 `OpenAI Codex`。浏览器通过 Harness settings-scope transport 绑定该 namespace，把账户、额度以及带保存/放弃的能力配置放在现有“插件配置”卡片中。带 revision 防护的逐字段写入不会覆盖无关设置；提交后会即时协调搜索与图片能力的注册状态，且绝不写入默认模型或全局搜索 namespace。
+Host 将 `llm-openai-codex` 注册为插件自有 settings namespace，并在 LLM 可配置 provider 目录中声明显示名为 `OpenAI Codex`。浏览器通过 Harness settings-scope transport 绑定该 namespace，把账户、额度以及带保存/放弃的能力配置放在现有“插件配置”卡片中。一次带 revision 防护的原子 namespace mutation 不会覆盖无关设置；提交后会即时协调搜索与图片能力的注册状态，且绝不写入默认模型或全局搜索 namespace。
+
+模型路由拥有由 Harness 现有 `llm-retry` 插件执行的普通有界重试策略。`modelMaxRetries` 默认为零、最多可设为十；启用后采用 1–30 秒指数退避。由于 pi-ai 0.84.2 会把部分 Codex WebSocket 和服务过载瞬时故障压成 `PI_AI_ERROR`，该代码暂时也可重试；此兼容兜底始终有界，且不适用于图片生成或编辑。
 
 ## OAuth 持久化
 
@@ -26,4 +28,4 @@ Host 将 `llm-openai-codex` 注册为插件自有 settings namespace，并在 LL
 
 注册前检查现有 provider id；发现 `openai-codex` 已被占用时，给出旧 bundle 或手动 provider 配置的定向迁移提示。boot-free CLI doctor 只报告包/运行时版本、OAuth 路径元数据、能力默认值和安全提示。
 
-Beta 固定使用 Harness `0.1.1-rc.2` 开发依赖，并使用其当前 pi-ai 认证与图片请求 API；Node.js 支持 `^22.19.0 || >=24.0.0`。`@earendil-works/pi-ai` 固定为 `0.82.1`。资格、额度、模型和后端协议仍由上游控制。测试仅使用临时 OAuth 文档和模拟网络响应，CI 不执行真实认证。
+Beta 固定使用 Harness `0.1.2-alpha.1` 开发依赖，并使用其当前 pi-ai 认证与图片请求 API；Node.js 支持 `^22.19.0 || >=24.0.0`。`@earendil-works/pi-ai` 固定为 `0.84.2`。资格、额度、模型和后端协议仍由上游控制。测试仅使用临时 OAuth 文档和模拟网络响应，CI 不执行真实认证。

@@ -4,18 +4,21 @@ All notable changes to this project are documented here.
 
 ## Unreleased
 
-## 0.1.0-beta.5 - 2026-08-23
-
-### Fixed
-
-- Codex image-bearing model requests now provide the pixel, per-image byte, and aggregate request budgets required by DeepSeek Harness `0.1.1-rc.2`, preventing attachment preprocessing from failing before provider dispatch.
-- The Codex adapter now shares its durable OAuth credential store and auth context with the current pi-ai adapter API.
-- Generated-image client previews no longer depend on the removed `ImageLoader` export from DSH's attachment UI package.
-- Release tests now force `NODE_ENV=test`, so an ambient production environment cannot load React's production build into Testing Library.
+## 0.1.0-beta.6 - 2026-08-29
 
 ### Changed
 
-- Updated the development and peer compatibility baseline to DeepSeek Harness `0.1.1-rc.2`.
+- Migrated the browser UI from the removed Client Runtime to the current session-controller, typed Slot, and settings APIs required by DeepSeek Harness `0.1.2-alpha.1`.
+- Updated the development and peer compatibility baseline to DeepSeek Harness `0.1.2-alpha.1`.
+
+### Fixed
+
+- Codex model requests can now opt into up to ten bounded retries with 1–30 second exponential backoff, preventing transient WebSocket and upstream-overload failures flattened by pi-ai into `PI_AI_ERROR` from immediately terminating long tasks.
+- Retry configuration continues to default to zero, remains cancellable through Harness, and does not change the non-retrying image-generation policy.
+- Codex image-bearing model requests now provide the pixel, per-image byte, and aggregate request budgets required by DeepSeek Harness `0.1.2-alpha.1`, preventing attachment preprocessing from failing before provider dispatch.
+- The Codex adapter now shares its durable OAuth credential store and auth context with the current pi-ai adapter API.
+- Generated-image client previews use the current DSH attachment-access API.
+- Release tests now force `NODE_ENV=test`, so an ambient production environment cannot load React's production build into Testing Library.
 
 ## 0.1.0-beta.4 - 2026-08-18
 

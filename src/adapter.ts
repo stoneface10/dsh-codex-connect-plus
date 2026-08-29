@@ -2,7 +2,7 @@
 /** OpenAI Codex adapter assembled from public dsh-llm-pi-ai extension points. */
 
 import type { Provider } from '@earendil-works/pi-ai'
-import { resolveRetryPolicy } from '@deepseek-ai/dsh-llm'
+import { resolveImageAttachmentAccess, resolveRetryPolicy } from '@deepseek-ai/dsh-llm'
 import { PiAiAdapter } from '@deepseek-ai/dsh-llm-pi-ai'
 import type { ResolvedPiAiProviderProfile } from '@deepseek-ai/dsh-llm-pi-ai'
 import type { AttachmentStore } from '@deepseek-ai/dsh-attachment'
@@ -17,6 +17,24 @@ export const OPENAI_CODEX_MAX_REQUEST_IMAGE_BYTES = 20 * 1024 * 1024
 export const OPENAI_CODEX_REQUEST_IMAGE_PIXEL_BUDGET = 2048 * 2048
 /** Encoded-byte ceiling for each deterministic inline request image. */
 export const OPENAI_CODEX_REQUEST_IMAGE_MAX_BYTES = 1024 * 1024
+/** Initial delay for subscription-backed model request recovery. */
+export const OPENAI_CODEX_RETRY_INITIAL_DELAY_MS = 1_000
+/** Maximum delay between subscription-backed model request attempts. */
+export const OPENAI_CODEX_RETRY_MAX_DELAY_MS = 30_000
+/** Symmetric jitter applied to subscription-backed model retry delays. */
+export const OPENAI_CODEX_RETRY_JITTER_RATIO = 0.2
+/**
+ * Retryable failures for the Codex route. PI_AI_ERROR is a bounded compatibility
+ * fallback while pi-ai discards structured transient WebSocket and overload codes.
+ */
+export const OPENAI_CODEX_RETRYABLE_CODES = Object.freeze([
+  'EMPTY_RESPONSE',
+  'RATE_LIMIT',
+  'SERVER',
+  'TIMEOUT',
+  'TRANSPORT',
+  'PI_AI_ERROR',
+])
 
 /**
  * Give the generic dsh adapter a request-scoped bearer-token entry without
@@ -52,7 +70,16 @@ export function createOpenAICodexProfile(provider: Provider, maxRetries: number)
     requestImagePixelBudget: OPENAI_CODEX_REQUEST_IMAGE_PIXEL_BUDGET,
     requestImageMaxBytes: OPENAI_CODEX_REQUEST_IMAGE_MAX_BYTES,
     retryPolicy: resolveRetryPolicy(
-      { mode: 'normal', maxRetries },
+      {
+        mode: 'normal',
+        maxRetries,
+        retryableCodes: [...OPENAI_CODEX_RETRYABLE_CODES],
+        backoff: {
+          initialDelayMs: OPENAI_CODEX_RETRY_INITIAL_DELAY_MS,
+          maxDelayMs: OPENAI_CODEX_RETRY_MAX_DELAY_MS,
+          jitterRatio: OPENAI_CODEX_RETRY_JITTER_RATIO,
+        },
+      },
       'dsh-codex-connect-plus retryPolicy',
     ),
     configuredMaxTokens: new Map(),
@@ -70,6 +97,7 @@ export function createOpenAICodexAdapter(
   auth: OpenAICodexAuthRuntime,
   resolveAttachments: () => AttachmentStore | undefined,
   resolveModelMaxRetries: () => number = () => 0,
+  resolveProcessPath: (hostPath: string) => string | undefined = () => undefined,
 ): PiAiAdapter {
   const provider = auth.provider
   let cachedMaxRetries: number | undefined
@@ -89,5 +117,7 @@ export function createOpenAICodexAdapter(
     resolveApiKey: () => auth.accessToken(),
     auth: auth.adapterAuth,
     resolveAttachments,
+    resolveImageAccess: (attachments, ref) =>
+      resolveImageAttachmentAccess(attachments, resolveProcessPath, ref),
   })
 }

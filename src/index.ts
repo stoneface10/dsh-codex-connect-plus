@@ -123,7 +123,7 @@ export const OPENAI_CODEX_SETTINGS_NS = settingsNamespace(OPENAI_CODEX_SETTINGS_
 
 /** Composite model and standalone-search configuration. */
 export interface Config {
-  /** Extra full model requests after a transient failure (default 0, maximum 2). */
+  /** Extra full model requests after a transient or unclassified pi-ai failure (default 0, maximum 10). */
   modelMaxRetries?: number
   /** Register the optional standalone Codex search provider. */
   enableSearch?: boolean
@@ -168,6 +168,7 @@ export function apply(ctx: Context, config: Config): void {
     auth,
     () => ctx.get('attachments'),
     () => resolveOpenAICodexSettings(current()).modelMaxRetries,
+    hostPath => ctx.get('fs')?.processPathFromHostPath(hostPath),
   )
   const adapterRegistration = ctx.llm.registerAdapter([OPENAI_CODEX_PROVIDER], adapter)
   let registeredModelMaxRetries = resolveOpenAICodexSettings(current()).modelMaxRetries

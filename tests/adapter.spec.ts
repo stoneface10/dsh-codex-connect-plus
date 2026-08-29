@@ -8,6 +8,10 @@ import {
   createOpenAICodexProfile,
   OPENAI_CODEX_REQUEST_IMAGE_MAX_BYTES,
   OPENAI_CODEX_REQUEST_IMAGE_PIXEL_BUDGET,
+  OPENAI_CODEX_RETRY_INITIAL_DELAY_MS,
+  OPENAI_CODEX_RETRY_JITTER_RATIO,
+  OPENAI_CODEX_RETRY_MAX_DELAY_MS,
+  OPENAI_CODEX_RETRYABLE_CODES,
 } from '../src/adapter.ts'
 import type { OpenAICodexAuthRuntime } from '../src/auth-runtime.ts'
 
@@ -41,6 +45,19 @@ describe('OpenAI Codex adapter', () => {
       maxRequestImageBytes: 20 * 1024 * 1024,
       requestImagePixelBudget: 2048 * 2048,
       requestImageMaxBytes: 1024 * 1024,
+    })
+  })
+
+  it('bounds unclassified Codex recovery with exponential backoff', () => {
+    const profile = createOpenAICodexProfile(openaiCodexProvider(), 10)
+
+    expect(profile.retryPolicy).toEqual({
+      mode: 'normal',
+      maxRetries: 10,
+      retryableCodes: OPENAI_CODEX_RETRYABLE_CODES,
+      initialDelayMs: OPENAI_CODEX_RETRY_INITIAL_DELAY_MS,
+      maxDelayMs: OPENAI_CODEX_RETRY_MAX_DELAY_MS,
+      jitterRatio: OPENAI_CODEX_RETRY_JITTER_RATIO,
     })
   })
 

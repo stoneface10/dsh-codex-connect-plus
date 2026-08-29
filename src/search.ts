@@ -16,12 +16,6 @@ import type {
 } from '@deepseek-ai/dsh-web'
 import type { OpenAICodexCredentialStore } from './store.ts'
 import { OPENAI_CODEX_PROVIDER } from './store.ts'
-import {
-  DEFAULT_OPENAI_CODEX_SEARCH_CONTEXT_SIZE,
-  DEFAULT_OPENAI_CODEX_SEARCH_MAX_OUTPUT_TOKENS,
-  DEFAULT_OPENAI_CODEX_SEARCH_MODE,
-  DEFAULT_OPENAI_CODEX_SEARCH_MODEL,
-} from './settings-contract.ts'
 import type { OpenAICodexSearchContextSize, OpenAICodexSearchMode } from './settings-contract.ts'
 import { redactProviderDiagnostic } from './redaction.ts'
 

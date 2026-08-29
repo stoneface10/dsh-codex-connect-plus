@@ -1,14 +1,22 @@
 /* Modified from dsh-codex-connect by 0751 for dsh-codex-connect-plus; Copyright 2026 0751; Apache-2.0, see NOTICE. */
 /** Staged optional-capability editor inside the OpenAI Codex plugin card. */
 
-import { useCallback, useEffect, useState, useSyncExternalStore } from 'react'
+import { useEffect, useState } from 'react'
 import type { CSSProperties } from 'react'
-import type { SettingsScope } from '@deepseek-ai/dsh-client-runtime/client'
+import type { SettingsScopeSnapshot } from '@deepseek-ai/dsh-client-ui-settings/client'
+import { MAX_OPENAI_CODEX_MODEL_RETRIES } from '../settings-contract.ts'
 import type { OpenAICodexSettingsConfig } from '../settings-contract.ts'
 import type { OpenAICodexSettingsKey } from './locales.ts'
 
+/** Save one staged configuration and return the Host-accepted settings view. */
+export type SaveOpenAICodexSettings = (
+  desired: OpenAICodexSettingsConfig,
+  expectedRevision?: number,
+) => Promise<SettingsScopeSnapshot<OpenAICodexSettingsConfig>>
+
 export interface OpenAICodexConfigurationProps {
-  scope?: SettingsScope<OpenAICodexSettingsConfig>
+  snapshot: SettingsScopeSnapshot<OpenAICodexSettingsConfig>
+  saveConfig: SaveOpenAICodexSettings
   t: (key: OpenAICodexSettingsKey, params?: Record<string, unknown>) => string
 }
 
@@ -29,15 +37,10 @@ const primaryButtonStyle: CSSProperties = { ...buttonStyle, borderColor: 'var(--
 const errorStyle: CSSProperties = { ...bodyStyle, color: 'var(--dsw-alias-state-error-primary)' }
 const successStyle: CSSProperties = { ...bodyStyle, color: 'var(--dsw-alias-state-success-primary, #16825d)' }
 
-const UNAVAILABLE_SNAPSHOT = {
-  status: 'unavailable' as const,
-  value: undefined,
-  base: undefined,
-  user: undefined,
-  revision: undefined,
-  writable: false,
-  mode: 'memory' as const,
-}
+const RETRY_OPTIONS = Array.from(
+  { length: MAX_OPENAI_CODEX_MODEL_RETRIES + 1 },
+  (_, modelMaxRetries) => modelMaxRetries,
+)
 
 const CONFIG_FIELDS = [
   'modelMaxRetries',
@@ -59,14 +62,7 @@ function sameConfig(
 }
 
 /** Edit the Host-owned llm-openai-codex settings section with Save/Discard staging. */
-export function OpenAICodexConfiguration({ scope, t }: OpenAICodexConfigurationProps) {
-  const subscribe = useCallback((listener: () => void) => scope?.subscribe(listener) ?? (() => undefined), [scope])
-  const getSnapshot = useCallback(() => scope?.getSnapshot() ?? UNAVAILABLE_SNAPSHOT, [scope])
-  const snapshot = useSyncExternalStore(
-    subscribe,
-    getSnapshot,
-    getSnapshot,
-  )
+export function OpenAICodexConfiguration({ snapshot, saveConfig, t }: OpenAICodexConfigurationProps) {
   const [draft, setDraft] = useState<OpenAICodexSettingsConfig | undefined>(snapshot.value)
   const [dirty, setDirty] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -86,7 +82,7 @@ export function OpenAICodexConfiguration({ scope, t }: OpenAICodexConfigurationP
   }
 
   const discard = (): void => {
-    setDraft(scope?.getSnapshot().value)
+    setDraft(snapshot.value)
     setDirty(false)
     setFeedback('idle')
   }
@@ -94,7 +90,7 @@ export function OpenAICodexConfiguration({ scope, t }: OpenAICodexConfigurationP
   const validRetries = draft !== undefined
     && Number.isInteger(draft.modelMaxRetries)
     && draft.modelMaxRetries >= 0
-    && draft.modelMaxRetries <= 2
+    && draft.modelMaxRetries <= MAX_OPENAI_CODEX_MODEL_RETRIES
   const validModel = draft !== undefined && draft.searchModel.trim().length > 0
   const validTokens = draft !== undefined
     && Number.isInteger(draft.searchMaxOutputTokens)
@@ -102,26 +98,19 @@ export function OpenAICodexConfiguration({ scope, t }: OpenAICodexConfigurationP
   const valid = validRetries && validModel && validTokens
 
   const save = async (): Promise<void> => {
-    if (scope === undefined || draft === undefined || !snapshot.writable || !valid) return
+    if (draft === undefined || !snapshot.writable || !valid) return
     const desired = { ...draft, searchModel: draft.searchModel.trim() }
     setBusy(true)
     setFeedback('idle')
     try {
-      for (const field of CONFIG_FIELDS) {
-        const accepted = scope.getSnapshot().value
-        if (accepted?.[field] === desired[field]) continue
-        await scope.set(field, desired[field])
-        if (scope.getSnapshot().value?.[field] !== desired[field]) {
-          throw new Error(`Host refused ${field}`)
-        }
-      }
-      const accepted = scope.getSnapshot().value
+      const acceptedSnapshot = await saveConfig(desired, snapshot.revision)
+      const accepted = acceptedSnapshot.value
       if (!sameConfig(accepted, desired)) throw new Error('Host returned a different configuration')
       setDraft(accepted)
       setDirty(false)
       setFeedback('saved')
     } catch {
-      setDraft(scope.getSnapshot().value)
+      setDraft(snapshot.value)
       setDirty(false)
       setFeedback('error')
     } finally {
@@ -152,9 +141,15 @@ export function OpenAICodexConfiguration({ scope, t }: OpenAICodexConfigurationP
               aria-invalid={!validRetries}
               onChange={event => { update('modelMaxRetries', Number(event.currentTarget.value)) }}
             >
-              <option value={0}>{t('retryNone')}</option>
-              <option value={1}>{t('retryOnce')}</option>
-              <option value={2}>{t('retryTwice')}</option>
+              {RETRY_OPTIONS.map(modelMaxRetries => (
+                <option key={modelMaxRetries} value={modelMaxRetries}>
+                  {modelMaxRetries === 0
+                    ? t('retryNone')
+                    : modelMaxRetries === 1
+                      ? t('retryOnce')
+                      : t('retryCount', { count: modelMaxRetries })}
+                </option>
+              ))}
             </select>
             <span style={bodyStyle}>{t('modelMaxRetriesHelp')}</span>
           </label>

@@ -40,7 +40,7 @@ Sign in once with ChatGPT OAuth. Codex model requests use the signed-in account'
 
 ## Requirements
 
-- **DeepSeek Harness `0.1.1-rc.2` or newer.** This release supplies the current pi-ai auth injection and image-request preprocessing budgets. Use `0.1.0-beta.4` only with the older `0.1.0-rc.7` Harness line.
+- **DeepSeek Harness `0.1.2-alpha.1` or newer.** This release supplies the current pi-ai auth injection and image-request preprocessing budgets. Use `0.1.0-beta.4` only with the older `0.1.0-rc.7` Harness line.
 - Node.js `^22.19.0 || >=24.0.0`.
 
 ## Install
@@ -54,7 +54,7 @@ dsh plugin --profile web add dsh-codex-connect-plus@beta
 Immutable GitHub fallback:
 
 ```sh
-dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-beta.5'
+dsh plugin --profile web add 'github:stoneface10/dsh-codex-connect-plus#v0.1.0-beta.6'
 ```
 
 A matching `.tgz` is also attached to the GitHub prerelease.
@@ -64,6 +64,8 @@ For local development:
 ```sh
 dsh plugin --profile web add link:/absolute/path/to/dsh-codex-connect-plus
 ```
+
+Source development for this prerelease expects the DeepSeek Harness `0.1.2-alpha.1` checkout in the sibling `../DSH` directory because its workspace packages are not yet published individually on npm.
 
 Do not install `dsh-codex-connect`, `dsh-codex-image-connect`, and this combined package in the same profile: they own the same provider and tool names.
 
@@ -84,7 +86,7 @@ enableImageTool: false
 enableImageGeneration: true
 ```
 
-The package does not take over the profile's default model or global search route. `modelMaxRetries: 0` avoids silently repeating a full subscription-backed request after a transient failure; users may deliberately select one or two retries in Plugin configuration when reliability matters more than quota conservation. Image generation/editing remains non-retrying because the provider may already have processed a timed-out request. Leave `enableImageTool` disabled when direct multimodal uploads and DSH's native `read_image` cover the workflow; enable it only when the model must open credential-free public HTTP(S) image URLs directly.
+The package does not take over the profile's default model or global search route. `modelMaxRetries: 0` avoids silently repeating a full subscription-backed request after a transient failure; users may deliberately select any bounded value from 1 through 10 retries when reliability matters more than quota conservation. Enabled retries use 1–30 second exponential backoff and temporarily include `PI_AI_ERROR` because current pi-ai flattens some Codex WebSocket and server-overload failures into that unclassified code. Image generation/editing remains non-retrying because the provider may already have processed a timed-out request. Leave `enableImageTool` disabled when direct multimodal uploads and DSH's native `read_image` cover the workflow; enable it only when the model must open credential-free public HTTP(S) image URLs directly.
 
 ## Image tools
 

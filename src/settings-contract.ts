@@ -20,8 +20,8 @@ export const DEFAULT_OPENAI_CODEX_SEARCH_CONTEXT_SIZE: OpenAICodexSearchContextS
 export const DEFAULT_OPENAI_CODEX_SEARCH_MAX_OUTPUT_TOKENS = 10_000
 /** Conservative default: do not silently replay a full subscription-backed model request. */
 export const DEFAULT_OPENAI_CODEX_MODEL_MAX_RETRIES = 0
-/** Upper bound exposed by this plugin for deliberate transient-error retries. */
-export const MAX_OPENAI_CODEX_MODEL_RETRIES = 2
+/** Upper bound exposed by this plugin for deliberate bounded recovery. */
+export const MAX_OPENAI_CODEX_MODEL_RETRIES = 10
 
 /** Fully resolved user-editable section presented by Plugin configuration. */
 export interface OpenAICodexSettingsConfig {

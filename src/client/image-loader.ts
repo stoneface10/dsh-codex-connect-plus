@@ -2,7 +2,8 @@
 /** Session-authorized image loader for generated attachment references. */
 
 import type { ImageAttachmentRef } from '@deepseek-ai/dsh-attachment'
-import type { ISessions, SessionId } from '@deepseek-ai/dsh-client-runtime/client'
+import type { ISessions } from '@deepseek-ai/dsh-api-session-controller/client'
+import type { SessionId } from '@deepseek-ai/dsh-session/types'
 
 /** Resolve a generated attachment to a short-lived browser object URL. */
 export type CodexImageLoader = (attachment: ImageAttachmentRef) => Promise<string>

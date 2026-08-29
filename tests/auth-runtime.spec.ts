@@ -21,7 +21,7 @@ describe('shared OpenAI Codex auth runtime', () => {
       type: 'oauth',
       access: 'current-access',
       refresh: 'stored-refresh',
-      expires: Date.now() + 60_000,
+      expires: Date.now() + 60 * 60 * 1000,
       accountId: 'account-123',
     }
     await store.modify(OPENAI_CODEX_PROVIDER, () => Promise.resolve(credential))

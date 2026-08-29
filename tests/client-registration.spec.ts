@@ -7,13 +7,15 @@ describe('OpenAI Codex browser contribution', () => {
     expect(client).toContain("ctx.slots.inject('settings.plugin.item'")
     expect(client).toContain("name: 'settings.plugin.item'")
     expect(client).toContain('key: OPENAI_CODEX_SETTINGS_NAMESPACE')
-    expect(client).toContain('priority: 30')
+    expect(client).not.toContain('priority:')
     expect(client).toContain('ctx.settingsScope.bind')
     expect(client).toContain('OPENAI_CODEX_SETTINGS_NAMESPACE')
     expect(client).not.toContain("ctx.slots.inject('settings.plugins.tab'")
     expect(client).not.toContain("ctx.slots.inject('settings.section'")
     expect(client).toContain("ctx.slots.inject('tool.call.toolview'")
-    expect(client).toContain('createCodexImageLoader(sessions, sessionId)')
+    expect(client).toContain('createCodexImageLoader(ctx.sessions, sessionId)')
+    expect(client).toContain("hooks: { openAICodexSettings: configScope }")
+    expect(client).not.toContain('@deepseek-ai/dsh-client-runtime/client')
   })
 
   it('keeps the committed browser bundle free of Host-only runtime imports', async () => {

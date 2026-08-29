@@ -223,8 +223,8 @@ declare const DEFAULT_OPENAI_CODEX_SEARCH_CONTEXT_SIZE: OpenAICodexSearchContext
 declare const DEFAULT_OPENAI_CODEX_SEARCH_MAX_OUTPUT_TOKENS = 10000;
 /** Conservative default: do not silently replay a full subscription-backed model request. */
 declare const DEFAULT_OPENAI_CODEX_MODEL_MAX_RETRIES = 0;
-/** Upper bound exposed by this plugin for deliberate transient-error retries. */
-declare const MAX_OPENAI_CODEX_MODEL_RETRIES = 2;
+/** Upper bound exposed by this plugin for deliberate bounded recovery. */
+declare const MAX_OPENAI_CODEX_MODEL_RETRIES = 10;
 /** Fully resolved user-editable section presented by Plugin configuration. */
 interface OpenAICodexSettingsConfig {
   /** Extra full model requests after a transient failure. */
@@ -380,7 +380,7 @@ declare const inject: string[];
 declare const OPENAI_CODEX_SETTINGS_NS: import("@deepseek-ai/dsh-settings").SettingsNamespace;
 /** Composite model and standalone-search configuration. */
 interface Config {
-  /** Extra full model requests after a transient failure (default 0, maximum 2). */
+  /** Extra full model requests after a transient or unclassified pi-ai failure (default 0, maximum 10). */
   modelMaxRetries?: number;
   /** Register the optional standalone Codex search provider. */
   enableSearch?: boolean;

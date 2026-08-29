@@ -12,7 +12,7 @@ Install `dsh-codex-connect-plus` into one requested DeepSeek Harness profile wit
 
 ## Install and validate
 
-0. Confirm Harness is at least `0.1.1-rc.2` (`dsh --version`). Use plugin `0.1.0-beta.4` only with the older Harness `0.1.0-rc.7` line.
+0. Confirm Harness is at least `0.1.2-alpha.1` (`dsh --version`). Use plugin `0.1.0-beta.4` only with the older Harness `0.1.0-rc.7` line.
 
 1. Check `dsh --version` or `dsh --help`. From a Harness checkout use `pnpm dsh`.
 2. Install the public npm beta:
@@ -21,7 +21,7 @@ Install `dsh-codex-connect-plus` into one requested DeepSeek Harness profile wit
    dsh plugin --profile web add dsh-codex-connect-plus@beta
    ```
 
-   For a reproducible fallback, use the immutable `v0.1.0-beta.5` GitHub tag or download the matching prerelease `.tgz` and verify its published SHA-256 before installation.
+   For a reproducible fallback, use the immutable `v0.1.0-beta.6` GitHub tag or download the matching prerelease `.tgz` and verify its published SHA-256 before installation.
 
 3. Run `dsh --profile web --dump-config` and require exactly one `llm-openai-codex` row loading `dsh-codex-connect-plus`.
 4. Confirm the effective `agent-default-model` and `web.searchProvider` values are unchanged from before installation.
@@ -35,7 +35,7 @@ Install `dsh-codex-connect-plus` into one requested DeepSeek Harness profile wit
 
 ## Optional configuration
 
-Use **Settings → Plugins → Plugin configuration → Codex Connect Plus** for staged Save/Discard edits. The package row supports `modelMaxRetries` (default `0`, accepted range `0`–`2`), `enableSearch` and `enableImageTool` (both default `false`), plus `enableImageGeneration` (default `true`). Keep retries at `0` for quota conservation; each retry repeats the complete failed model request. Enabling search registers a provider but does not select it; selecting `web.searchProvider: openai-codex` is a second explicit profile change. Setting `agent-default-model` to `openai-codex` is also a separate explicit change.
+Use **Settings → Plugins → Plugin configuration → Codex Connect Plus** for staged Save/Discard edits. The package row supports `modelMaxRetries` (default `0`, accepted range `0`–`10`; the UI offers every integer in that range), `enableSearch` and `enableImageTool` (both default `false`), plus `enableImageGeneration` (default `true`). Enabled retries use 1–30 second exponential backoff and repeat the complete failed model request, including bounded recovery for temporarily unclassified `PI_AI_ERROR` failures. Enabling search registers a provider but does not select it; selecting `web.searchProvider: openai-codex` is a second explicit profile change. Setting `agent-default-model` to `openai-codex` is also a separate explicit change.
 
 Apply only requested choices and preserve unrelated keys:
 
